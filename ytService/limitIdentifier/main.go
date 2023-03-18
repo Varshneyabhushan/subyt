@@ -24,7 +24,6 @@ func (tracker *LimitIdentifier) Scrutinise(idProviders []IdProvider) int {
 
 	for _, idProvider := range idProviders {
 		if idProvider.GetId() == tracker.Limit {
-			tracker.AdvanceLimit()
 			break
 		}
 

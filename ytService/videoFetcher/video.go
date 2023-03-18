@@ -3,37 +3,17 @@ package videofetcher
 import (
 	"time"
 	"google.golang.org/api/youtube/v3"
+	"ytservice/videosservice"
 )
 
-type Video struct {
-	Id string
-	Title string
-	Description string
-	Thumbnails []thumbnail
-	PublishedAt time.Time
-	Channel channel
-	CreatedAt time.Time
-}
-
-type thumbnail struct {
-	Width int64
-	Height int64
-	Url string
-}
-
-type channel struct {
-	Id string
-	Title string
-}
-
-func getVideos(items []*youtube.SearchResult) []Video {
-	var videos []Video 
+func getVideos(items []*youtube.SearchResult) []videosservice.Video {
+	var videos []videosservice.Video
 	for _, item := range items {
-		video := Video {
+		video := videosservice.Video {
 			Id: item.Id.VideoId,
 			Title: item.Snippet.Title,
 			Description: item.Snippet.Description,
-			Channel: channel{ 
+			Channel: videosservice.Channel { 
 				Id: item.Snippet.ChannelId,
 				Title: item.Snippet.ChannelTitle,
 			},
@@ -48,7 +28,7 @@ func getVideos(items []*youtube.SearchResult) []Video {
 	return videos
 }
 
-func getThumbnails(snippet youtube.SearchResultSnippet) (result []thumbnail){
+func getThumbnails(snippet youtube.SearchResultSnippet) (result []videosservice.Thumbnail){
 	thumbnails := []*youtube.Thumbnail {
 		snippet.Thumbnails.High,
 		snippet.Thumbnails.Medium,
@@ -56,7 +36,7 @@ func getThumbnails(snippet youtube.SearchResultSnippet) (result []thumbnail){
 	}
 
 	for _, tmb := range thumbnails {
-		result = append(result, thumbnail {
+		result = append(result, videosservice.Thumbnail {
 			Width: tmb.Width,
 			Height: tmb.Height,
 			Url: tmb.Url,
