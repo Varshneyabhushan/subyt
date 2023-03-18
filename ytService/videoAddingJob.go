@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"ytservice/limitidentifier"
 	"ytservice/videofetcher"
 	"ytservice/videosservice"
@@ -26,13 +26,11 @@ func AddVideos(
 	limitIdentifier *limitidentifier.LimitIdentifierStorage,
 	fetcher *videofetcher.VideoFetcher,
 	videosService videosservice.VideosService,
- ) {
-	
+ ) error {
 	for fetcher.HasNext() {
 		videos, err := fetcher.GetNext()
 		if err != nil {
-			fmt.Println("error while getting videos : " + err.Error())
-			break
+			return errors.New("error while getting videos : " + err.Error())
 		}
 
 		validVideosCount := limitIdentifier.Scrutinise(VideoIdProviders(videos))
@@ -41,18 +39,18 @@ func AddVideos(
 			limitIdentifier.AdvanceLimit()
 			err := limitIdentifier.Save()
 			if err != nil {
-				fmt.Println("error while storing limits : " + err.Error())
-				return
+				return errors.New("error while storing limits : " + err.Error())
 			}
 		}
 
 		if err = videosService.AddVideos(videos[:validVideosCount]); err != nil {
-			fmt.Println("error while adding videos : " + err.Error())
-			return
+			return errors.New("error while adding videos : " + err.Error())
 		}
 
 		if isLimiting {
-			break;
+			return nil
 		}
 	}
+
+	return nil
 }
