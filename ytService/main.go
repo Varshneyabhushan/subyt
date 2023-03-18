@@ -5,10 +5,10 @@ import (
 	"log"
 	"time"
 	"ytservice/env"
-	"ytservice/limitidentifier"
 	"ytservice/periodicjob"
 	"ytservice/videofetcher"
 	"ytservice/videosservice"
+        "ytservice/storage"
 )
 
 func main() {
@@ -16,6 +16,11 @@ func main() {
         if err != nil {
                 log.Println("error while getting env : " + err.Error())
                 return
+        }
+
+        checkPoint, err := storage.LoadCheckPoint("checkPoint.json")
+        if err != nil {
+                log.Fatal("error while loading checkpoint", err)
         }
 
         fetcher, err := videofetcher.New(context.Background(), envConfig.YoutubeSearch)
@@ -26,15 +31,9 @@ func main() {
 
         videosService := videosservice.NewVideoService("http://videoservice")
 
-        videoLimitIdentifier, err := limitidentifier.New("limits.json")
-        if err != nil {
-                log.Fatal("error while loading limit identifier", err)
-                return
-        }
-
         periodicJob := periodicjob.New(
                 func() {
-                        err := AddVideos(&videoLimitIdentifier, &fetcher, videosService, envConfig.YoutubeSearch.RequestCoolDown)
+                        err := AddVideos(checkPoint, fetcher, videosService, envConfig.YoutubeSearch.RequestCoolDown)
                         if err != nil {
                                 log.Fatal("error while adding videos : " + err.Error())
                         }

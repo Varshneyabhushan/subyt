@@ -10,7 +10,6 @@ func getVideos(items []*youtube.SearchResult) []videosservice.Video {
 	var videos []videosservice.Video
 	for _, item := range items {
 		video := videosservice.Video {
-			Id: item.Id.VideoId,
 			Title: item.Snippet.Title,
 			Description: item.Snippet.Description,
 			Channel: videosservice.Channel { 
@@ -21,7 +20,8 @@ func getVideos(items []*youtube.SearchResult) []videosservice.Video {
 		}
 
 		video.Thumbnails = getThumbnails(*item.Snippet)
-		video.PublishedAt, _ = time.Parse(time.RFC3339, item.Snippet.PublishedAt)
+		video.VideoComparor.Id = item.Id.VideoId
+		video.VideoComparor.PublishedAt, _ = time.Parse(time.RFC3339, item.Snippet.PublishedAt)
 		videos = append(videos, video)
 	}
 

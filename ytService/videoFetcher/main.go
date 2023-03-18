@@ -14,13 +14,13 @@ import (
 type VideoFetcher struct {
 	query string
 	maxResults int
-	nextPageToken string
+	NextPageToken string
 	hasInitiated bool
 	ytService *youtube.Service
 }
 
 func (fetcher VideoFetcher) HasNext() bool {
-	return !fetcher.hasInitiated || len(fetcher.nextPageToken) != 0
+	return !fetcher.hasInitiated || len(fetcher.NextPageToken) != 0
 }
 
 func (fetcher *VideoFetcher) GetNext() ([]videosservice.Video, error){
@@ -28,7 +28,7 @@ func (fetcher *VideoFetcher) GetNext() ([]videosservice.Video, error){
 		Q(fetcher.query).
 		MaxResults(int64(fetcher.maxResults)).
 		Order("date").
-		PageToken(fetcher.nextPageToken).
+		PageToken(fetcher.NextPageToken).
 		Do()
 
 	//TODO: handle errors according to the requirement
@@ -36,7 +36,7 @@ func (fetcher *VideoFetcher) GetNext() ([]videosservice.Video, error){
 		return []videosservice.Video{}, errors.New("error while getting results from youtube" + err.Error())
 	}
 
-	fetcher.nextPageToken = response.NextPageToken
+	fetcher.NextPageToken = response.NextPageToken
 	fetcher.hasInitiated = true
 	return getVideos(response.Items), nil
 }
