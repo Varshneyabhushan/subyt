@@ -10,21 +10,21 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
-//follows iterator pattern
+// follows iterator pattern
 type VideoFetcher struct {
-	query string
-	maxResults int
+	query         string
+	maxResults    int
 	NextPageToken string
-	hasInitiated bool
-	ytService *youtube.Service
+	hasInitiated  bool
+	ytService     *youtube.Service
 }
 
-func (fetcher VideoFetcher) HasNext() bool {
+func (fetcher *VideoFetcher) HasNext() bool {
 	return !fetcher.hasInitiated || len(fetcher.NextPageToken) != 0
 }
 
-func (fetcher *VideoFetcher) GetNext() ([]videosservice.Video, error){
-	response, err := fetcher.ytService.Search.List([]string{ "id", "snippet"}).
+func (fetcher *VideoFetcher) GetNext() ([]videosservice.Video, error) {
+	response, err := fetcher.ytService.Search.List([]string{"id", "snippet"}).
 		Q(fetcher.query).
 		MaxResults(int64(fetcher.maxResults)).
 		Order("date").
@@ -41,16 +41,15 @@ func (fetcher *VideoFetcher) GetNext() ([]videosservice.Video, error){
 	return getVideos(response.Items), nil
 }
 
-
 func New(ctx context.Context, youtubeConfig env.YoutubeSearchConfig) (VideoFetcher, error) {
 	service, err := youtube.NewService(ctx, option.WithAPIKey(youtubeConfig.DevKey))
 	if err != nil {
 		return VideoFetcher{}, err
 	}
 
-	return VideoFetcher{ 
-		query : youtubeConfig.Query,
-		ytService: service,
-		maxResults : youtubeConfig.MaxResults,
+	return VideoFetcher{
+		query:      youtubeConfig.Query,
+		ytService:  service,
+		maxResults: youtubeConfig.MaxResults,
 	}, nil
 }
