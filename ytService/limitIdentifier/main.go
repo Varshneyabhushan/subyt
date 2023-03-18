@@ -1,9 +1,19 @@
 package limitidentifier
 
+import "encoding/json"
+
 //tracks if videos limit reached or not
 type LimitIdentifier struct {
 	From string
 	Limit string
+}
+
+type storageFormat struct {
+	Limit string
+}
+
+func (i LimitIdentifier) MarshalJSON() ([]byte, error){
+	return json.Marshal(storageFormat{ Limit: i.Limit })
 }
 
 func (tracker *LimitIdentifier) AdvanceLimit() {
