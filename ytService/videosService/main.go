@@ -14,7 +14,9 @@ func (service VideosService) AddVideos(videos []Video) error {
 	}
 
 	//send these videos to videosService
-	fmt.Println(videos)
+	for _, video := range videos {
+		fmt.Println(video.Id, video.Title, video.PublishedAt)
+	}
 	return nil
 }
 
