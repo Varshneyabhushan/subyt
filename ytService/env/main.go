@@ -10,6 +10,7 @@ type YoutubeSearchConfig struct {
 	DevKey string
 	Query string
 	MaxResults int
+	RequestCoolDown int //in seconds
 }
 
 type SchedulerConfig struct {

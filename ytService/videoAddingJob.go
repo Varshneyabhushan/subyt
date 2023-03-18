@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"time"
 	"ytservice/limitidentifier"
 	"ytservice/videofetcher"
 	"ytservice/videosservice"
@@ -26,8 +27,14 @@ func AddVideos(
 	limitIdentifier *limitidentifier.LimitIdentifierStorage,
 	fetcher *videofetcher.VideoFetcher,
 	videosService videosservice.VideosService,
+	coolDown int,
  ) error {
+	if(len(limitIdentifier.Limit) == 0) {
+		return errors.New("limit is zero in limit identifier")
+	}
+
 	for fetcher.HasNext() {
+		timeout := time.After(time.Duration(coolDown)* time.Second)
 		videos, err := fetcher.GetNext()
 		if err != nil {
 			return errors.New("error while getting videos : " + err.Error())
@@ -47,6 +54,7 @@ func AddVideos(
 			return errors.New("error while adding videos : " + err.Error())
 		}
 
+		<- timeout
 		if isLimiting {
 			return nil
 		}
