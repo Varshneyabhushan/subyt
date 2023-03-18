@@ -13,7 +13,7 @@ func AddVideos(
 	fetcher videofetcher.VideoFetcher,
 	videosService videosservice.VideosService,
 	coolDown int,
- ) error {
+) error {
 
 	if checkPoint.LimitVideo.IsEmpty() {
 		return errors.New("limit is empty in limit identifier")
@@ -22,7 +22,7 @@ func AddVideos(
 	var nextLimitVideo videosservice.VideoComparor
 
 	for fetcher.HasNext() {
-		timeout := time.After(time.Duration(coolDown)* time.Second)
+		timeout := time.After(time.Duration(coolDown) * time.Second)
 		videos, err := fetcher.GetNext()
 		if err != nil {
 			return errors.New("error while getting videos : " + err.Error())
@@ -51,7 +51,7 @@ func AddVideos(
 			return errors.New("error while storing limits : " + err.Error())
 		}
 
-		<- timeout
+		<-timeout
 		if isLimiting {
 			return nil
 		}
