@@ -18,7 +18,7 @@ func main() {
                 return
         }
 
-        checkPoint, err := storage.LoadCheckPoint("checkPoint.json")
+        checkPoint, err := storage.LoadCheckPoint(envConfig.CheckPointPath)
         if err != nil {
                 log.Fatal("error while loading checkpoint", err)
         }
@@ -29,7 +29,7 @@ func main() {
                 return
         }
 
-        videosService := videosservice.NewVideoService("http://videoservice")
+        videosService := videosservice.NewVideoService(envConfig.VideoServiceURL)
 
         periodicJob := periodicjob.New(
                 func() {
@@ -38,7 +38,7 @@ func main() {
                                 log.Fatal("error while adding videos : " + err.Error())
                         }
                 },
-                time.Minute,
+                time.Duration(envConfig.Scheduler.Period)* time.Second,
         )
 
         periodicJob.Start()

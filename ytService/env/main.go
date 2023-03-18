@@ -20,6 +20,8 @@ type SchedulerConfig struct {
 type Config struct {
 	YoutubeSearch YoutubeSearchConfig
 	Scheduler SchedulerConfig
+	CheckPointPath string
+	VideoServiceURL string
 }
 
 func GetConfig() (result Config, err error) {
