@@ -5,8 +5,10 @@ import (
 	"log"
 	"time"
 	"ytservice/env"
-	"fmt"
+	"ytservice/limitidentifier"
+	"ytservice/periodicjob"
 	"ytservice/videofetcher"
+	"ytservice/videosservice"
 )
 
 func main() {
@@ -18,17 +20,28 @@ func main() {
 
         fetcher, err := videofetcher.New(context.Background(), envConfig.YoutubeSearch)
         if err != nil {
-                fmt.Println("here we go", err)
+                log.Fatal("error while making videoFetcher", err)
+                return
         }
 
-        for fetcher.HasNext() {
-                timeout := time.After(5*time.Second)
-                videos, err := fetcher.GetNext()
-                fmt.Println("fetched videos of length", len(videos), err)
-                for _, video := range videos {
-                        fmt.Println(video.Title)
-                }
+        videosService := videosservice.NewVideoService("http://videoservice")
 
-                <- timeout
+        videoLimitIdentifier, err := limitidentifier.New("limits.json")
+        if err != nil {
+                log.Fatal("error while loading limit identifier", err)
+                return
         }
+
+        periodicJob := periodicjob.New(
+                func() {
+                        err := AddVideos(&videoLimitIdentifier, &fetcher, videosService, envConfig.YoutubeSearch.RequestCoolDown)
+                        if err != nil {
+                                log.Fatal("error while adding videos : " + err.Error())
+                        }
+                },
+                time.Minute,
+        )
+
+        periodicJob.Start()
+        time.Sleep(time.Minute)
 }
