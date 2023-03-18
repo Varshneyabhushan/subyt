@@ -16,10 +16,11 @@ func AddVideos(
 ) error {
 
 	if checkPoint.LimitVideo.IsEmpty() {
-		return errors.New("limit is empty in limit identifier")
+		return errors.New("limit on video is empty")
 	}
 
 	var nextLimitVideo videosservice.VideoComparor
+	fetcher.NextPageToken = checkPoint.NextPageToken
 
 	for fetcher.HasNext() {
 		timeout := time.After(time.Duration(coolDown) * time.Second)
@@ -29,7 +30,7 @@ func AddVideos(
 		}
 
 		validVideosCount := videosservice.GetValidVideos(videos, checkPoint.LimitVideo)
-		if len(videos) != 0 && nextLimitVideo.IsEmpty() {
+		if validVideosCount != 0 && nextLimitVideo.IsEmpty() {
 			nextLimitVideo = videos[0].VideoComparor
 		}
 
