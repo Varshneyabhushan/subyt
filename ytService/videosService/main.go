@@ -1,7 +1,11 @@
 package videosservice
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 )
 
 type VideosService struct {
@@ -13,13 +17,20 @@ func (service VideosService) AddVideos(videos []Video) error {
 		return nil
 	}
 
-	//send these videos to videosService
-	for _, video := range videos {
-		fmt.Println(video.Id, video.Title, video.PublishedAt)
+	payload, err := json.Marshal(videos)
+	if err != nil {
+		return errors.New("error while marshalling : " + err.Error())
 	}
-	return nil
+
+	url := fmt.Sprintf("%s/videos", service.apiUrl)
+	_, err = http.Post(url, "application/json", bytes.NewBuffer(payload))
+	if err != nil {
+		return errors.New("error while sending request : " + err.Error())
+	}
+
+	return err
 }
 
 func NewVideoService(apiUrl string) VideosService {
-	return VideosService{ apiUrl: apiUrl }
+	return VideosService{apiUrl: apiUrl}
 }

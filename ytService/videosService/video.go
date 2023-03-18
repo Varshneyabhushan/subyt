@@ -13,7 +13,7 @@ type Video struct {
 	Thumbnails    []Thumbnail
 	Channel       Channel
 	CreatedAt     time.Time
-	VideoComparor `json:"-"`
+	VideoComparor `json:",inline"`
 }
 
 type Thumbnail struct {
