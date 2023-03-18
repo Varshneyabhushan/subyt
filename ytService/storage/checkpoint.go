@@ -19,19 +19,22 @@ type CheckPoint struct {
 	LimitVideo    videosservice.VideoComparor
 }
 
-var defaultLimitVideo = time.Date(2023, 03, 10, 0, 0, 0, 0, nil)
+var defaultLimitVideo, _ = time.Parse(time.RFC3339, "2023-03-10T00:00:00Z")
 
 func LoadCheckPoint(filePath string) (CheckPoint, error) {
-	newCheckPoint := CheckPoint{filePath: filePath}
+	newCheckPoint := CheckPoint{
+		filePath: filePath,
+		LimitVideo: videosservice.VideoComparor{
+			PublishedAt: defaultLimitVideo,
+		},
+	}
+
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
-		return newCheckPoint, errors.New("error while reading file : " + err.Error())
+		return newCheckPoint, err
 	}
 
 	err = json.Unmarshal(bytes, &newCheckPoint)
-	if newCheckPoint.LimitVideo.IsEmpty() {
-		newCheckPoint.LimitVideo.PublishedAt = defaultLimitVideo
-	}
 	return newCheckPoint, err
 }
 
