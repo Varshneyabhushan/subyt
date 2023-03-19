@@ -5,20 +5,21 @@ import (
 )
 
 type jobSignal struct{}
+
 var CloseSignal = jobSignal{}
 
-type periodicJob struct {
+type PeriodicJob struct {
 	endSignal chan jobSignal
-	period time.Duration
-	job func()
+	period    time.Duration
+	job       func()
 }
 
 /*
 for every timePeriod given, repeat the job
 util a closeSignal is passed
 */
-func (p periodicJob) Start() {
-	go func ()  {
+func (p PeriodicJob) Start() {
+	go func() {
 		for {
 			jobChannel := make(chan jobSignal)
 			timeout := time.After(p.period)
@@ -28,13 +29,13 @@ func (p periodicJob) Start() {
 			}()
 
 			select {
-			//when closeSignal is passed, return from the func (process complete) 
-			case <- p.endSignal:
+			//when closeSignal is passed, return from the func (process complete)
+			case <-p.endSignal:
 				return
 
 			//if the job is over, wait till the time is up
-			case <- timeout:
-				<- jobChannel
+			case <-timeout:
+				<-jobChannel
 			}
 
 			close(jobChannel)
@@ -42,15 +43,15 @@ func (p periodicJob) Start() {
 	}()
 }
 
-//end the periodic job
-func (p periodicJob) End() {
+// end the periodic job
+func (p PeriodicJob) End() {
 	p.endSignal <- CloseSignal
 }
 
-func New(job func(), period time.Duration) periodicJob {
-	return periodicJob{
-		period: period,
-		job: job,
+func New(job func(), period time.Duration) PeriodicJob {
+	return PeriodicJob{
+		period:    period,
+		job:       job,
 		endSignal: make(chan jobSignal),
 	}
 }

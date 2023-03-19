@@ -7,20 +7,20 @@ import (
 )
 
 type YoutubeSearchConfig struct {
-	DevKey string
-	Query string
+	DevKey     string
+	Query      string
 	MaxResults int
-	RequestCoolDown int //in seconds
 }
 
 type SchedulerConfig struct {
-	Period int
+	Period          int //in seconds
+	RequestCoolDown int //in seconds
 }
 
 type Config struct {
-	YoutubeSearch YoutubeSearchConfig
-	Scheduler SchedulerConfig
-	CheckPointPath string
+	YoutubeSearch   YoutubeSearchConfig
+	Scheduler       SchedulerConfig
+	CheckPointPath  string
 	VideoServiceURL string
 }
 

@@ -1,12 +1,35 @@
-package main
+package periodicjob
 
 import (
 	"errors"
+	"log"
 	"time"
+	"ytservice/env"
 	"ytservice/storage"
 	"ytservice/videofetcher"
 	"ytservice/videosservice"
 )
+
+func StartSyncingVideos(
+	checkPoint storage.CheckPoint,
+	fetcher videofetcher.VideoFetcher,
+	videosService videosservice.VideosService,
+	config env.SchedulerConfig,
+) {
+
+	periodicSync := New(
+		func() {
+			err := AddVideos(checkPoint, fetcher, videosService, config.RequestCoolDown)
+			if err != nil {
+				log.Fatal("error while adding videos : " + err.Error())
+			}
+		},
+		time.Duration(config.Period)*time.Second,
+	)
+
+	periodicSync.Start()
+	time.Sleep(time.Minute)
+}
 
 func AddVideos(
 	checkPoint storage.CheckPoint,

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"time"
 	"ytservice/env"
 	"ytservice/periodicjob"
 	"ytservice/storage"
@@ -31,17 +30,5 @@ func main() {
 
 	videosService := videosservice.NewVideoService(envConfig.VideoServiceURL)
 
-	periodicJob := periodicjob.New(
-		func() {
-			err := AddVideos(checkPoint, fetcher, videosService,
-				envConfig.YoutubeSearch.RequestCoolDown)
-			if err != nil {
-				log.Fatal("error while adding videos : " + err.Error())
-			}
-		},
-		time.Duration(envConfig.Scheduler.Period)*time.Second,
-	)
-
-	periodicJob.Start()
-	time.Sleep(time.Minute)
+	periodicjob.StartSyncingVideos(checkPoint, fetcher, videosService, envConfig.Scheduler)
 }
