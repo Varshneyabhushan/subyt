@@ -6,9 +6,9 @@ import (
 )
 
 type Video struct {
-	Id         primitive.ObjectID
+	Id         primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	YtId       string
-	Properties `json:",inline"`
+	Properties `json:",inline" bson:",inline"`
 	Thumbnails []Thumbnail
 	Channel    Channel
 }
