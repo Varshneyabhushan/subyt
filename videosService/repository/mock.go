@@ -1,6 +1,8 @@
-package videos
+package repository
 
-import "strings"
+import (
+	"strings"
+)
 
 type MockRepository struct {
 	videos map[string]Video

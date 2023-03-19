@@ -8,8 +8,10 @@ import (
 	"videosservice/addVideos"
 	"videosservice/env"
 	"videosservice/getVideos"
+	"videosservice/repository"
+	"videosservice/repository/mongo"
 	"videosservice/searchVideos"
-	"videosservice/videos"
+	"videosservice/storage"
 )
 
 func main() {
@@ -22,11 +24,16 @@ func main() {
 
 	router := httprouter.New()
 
-	videoRepo := videos.NewMockRepository()
+	database, err := storage.GetDatabase("", "videosService")
+	videosCollection := database.Collection("repository")
 
-	router.POST("/videos", addVideos.MakeEndpoint(videoRepo))
-	router.GET("/videos", getVideos.MakeEndpoint(videoRepo))
-	router.GET("/search", searchVideos.MakeEndpoint(videoRepo))
+	videoRepository := mongo.NewRepository(videosCollection)
+
+	videosRepo := repository.NewCompositeRepository(videoRepository)
+
+	router.POST("/", addVideos.MakeEndpoint(videosRepo))
+	router.GET("/", getVideos.MakeEndpoint(videosRepo))
+	router.GET("/search", searchVideos.MakeEndpoint(videosRepo))
 
 	err = http.ListenAndServe(":"+strconv.Itoa(envConfig.ServerConfig.Port), router)
 	if err != nil {

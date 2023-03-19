@@ -5,11 +5,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"videosservice/videos"
+	"videosservice/repository"
 )
 
 type response struct {
-	videos []videos.Video
+	videos []repository.Video
 }
 
 func MakeEndpoint(s Service) httprouter.Handle {

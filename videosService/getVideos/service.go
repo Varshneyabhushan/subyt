@@ -1,7 +1,9 @@
 package getVideos
 
-import "videosservice/videos"
+import (
+	"videosservice/repository"
+)
 
 type Service interface {
-	Get(skip, limit int) ([]videos.Video, error)
+	Get(skip, limit int64) ([]repository.Video, error)
 }

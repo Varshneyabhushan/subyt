@@ -5,7 +5,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"videosservice/videos"
+	"videosservice/repository"
 )
 
 type response struct {
@@ -15,7 +15,7 @@ type response struct {
 func MakeEndpoint(s Service) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-		var addingVideos []videos.Video
+		var addingVideos []repository.Video
 		err := json.NewDecoder(r.Body).Decode(&addingVideos)
 		if err != nil {
 			http.Error(w, "invalid body sent", http.StatusBadRequest)

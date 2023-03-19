@@ -1,7 +1,9 @@
 package searchVideos
 
-import "videosservice/videos"
+import (
+	"videosservice/repository"
+)
 
 type Service interface {
-	Search(term string) ([]videos.Video, error)
+	Search(term string) ([]repository.Video, error)
 }

@@ -1,13 +1,21 @@
-package videos
+package mongo
 
-import "time"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
 
 type Video struct {
-	Id          string
+	Id         primitive.ObjectID
+	YtId       string
+	Properties `json:",inline"`
+	Thumbnails []Thumbnail
+	Channel    Channel
+}
+
+type Properties struct {
 	Title       string
 	Description string
-	Thumbnails  []Thumbnail
-	Channel     Channel
 	PublishedAt time.Time
 	CreatedAt   time.Time
 }
