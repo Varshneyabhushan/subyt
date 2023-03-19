@@ -1,16 +1,14 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
-	"videosservice/addVideos"
 	"videosservice/env"
-	"videosservice/getVideos"
+	"videosservice/httpServer"
 	"videosservice/repository"
 	"videosservice/repository/mongo"
-	"videosservice/searchVideos"
 	"videosservice/storage"
 )
 
@@ -22,22 +20,16 @@ func main() {
 		return
 	}
 
-	router := httprouter.New()
-
-	database, err := storage.GetDatabase("", "videosService")
-	videosCollection := database.Collection("repository")
-
-	videoRepository := mongo.NewRepository(videosCollection)
-
-	videosRepo := repository.NewCompositeRepository(videoRepository)
-
-	router.POST("/", addVideos.MakeEndpoint(videosRepo))
-	router.GET("/", getVideos.MakeEndpoint(videosRepo))
-	router.GET("/search", searchVideos.MakeEndpoint(videosRepo))
-
-	err = http.ListenAndServe(":"+strconv.Itoa(envConfig.ServerConfig.Port), router)
+	database, err := storage.GetDatabase(envConfig.MongoConfig)
 	if err != nil {
-		log.Fatal("error while starting the server")
+		log.Fatal("error while connecting to database : ", err)
 		return
 	}
+
+	videoRepository := mongo.NewRepository(database.Collection("videos"))
+	videosRepo := repository.NewCompositeRepository(videoRepository)
+
+	router := httpServer.MakeRouter(videosRepo)
+	address := fmt.Sprintf(":%s", strconv.Itoa(envConfig.ServerConfig.Port))
+	log.Fatal(http.ListenAndServe(address, router))
 }
