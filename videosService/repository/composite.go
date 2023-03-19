@@ -1,6 +1,9 @@
 package repository
 
-import "videosservice/repository/mongo"
+import (
+	"go.mongodb.org/mongo-driver/bson"
+	"videosservice/repository/mongo"
+)
 
 // CompositeRepository
 // should implement all the functionalities using its sub repositories
@@ -22,7 +25,7 @@ func (repo *CompositeRepository) Add(videos []Video) (int, error) {
 }
 
 func (repo *CompositeRepository) Get(skip, limit int64) ([]Video, error) {
-	mongoVideos, err := repo.mongoRepository.Get(skip, limit)
+	mongoVideos, err := repo.mongoRepository.Get(skip, limit, bson.M{"publishedat": -1})
 	if err != nil {
 		return nil, err
 	}
