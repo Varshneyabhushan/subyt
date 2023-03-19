@@ -8,7 +8,7 @@ type CompositeRepository struct {
 	mongoRepository *mongo.MongoRepository
 }
 
-func NewCompositeRepository(mongoRepository *mongo.MongoRepository) *CompositeRepository {
+func NewCompositeRepository(mongoRepository *mongo.MongoRepository) Repository {
 	return &CompositeRepository{mongoRepository: mongoRepository}
 }
 
