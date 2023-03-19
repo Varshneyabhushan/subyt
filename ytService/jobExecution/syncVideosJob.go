@@ -20,10 +20,10 @@ func MakeSyncVideosJob(
 	syncCoolDown := config.SyncCoolDown
 
 	return func() (time.Duration, error) {
-		response, err := fetcher.GetNext(checkPoint.NextPageToken)
-		if err != nil {
-			log.Println("error while getting videos : ", err)
-			return delayTracker.ExponentialBackOff(), nil
+
+		response, toDelay, err := fetchVideoResponse(*fetcher, checkPoint.NextPageToken, delayTracker)
+		if err != nil || toDelay {
+			return delayTracker.Delay(), err
 		}
 
 		newCheckPoint, totalValidVideos := NewCheckpoint(*checkPoint, response)
@@ -52,8 +52,36 @@ func MakeSyncVideosJob(
 	}
 }
 
+func fetchVideoResponse(fetcher videofetcher.VideoFetcher, nextPageToken string,
+	tracker *DelayTracker) (videofetcher.VideosResponse, bool, error) {
+	response, err := fetcher.GetNext(nextPageToken)
+	if err != nil {
+		//if status is 4xx, requests has to be stopped
+		if response.Status >= 400 && response.Status < 410 {
+			return response, false, err
+		}
+
+		//client exhausted or server error
+		if response.Status == 429 || response.Status >= 500 {
+			log.Println("google server error : ", response.Status, err)
+			tracker.ExponentialBackOff()
+			return response, true, nil
+		}
+
+		log.Println("error while getting videos : ", err)
+		tracker.ProportionalDelay()
+		return response, true, nil
+	}
+
+	return response, false, nil
+}
+
 func NewCheckpoint(checkPoint storage.CheckPoint, response videofetcher.VideosResponse) (
 	storage.CheckPoint, int) {
+
+	if len(response.Videos) == 0 {
+		return checkPoint, 0
+	}
 
 	totalValidVideos := videosservice.GetValidVideos(response.Videos, checkPoint.VideoLimit)
 	if totalValidVideos != 0 && checkPoint.NextVideoLimit.IsEmpty() {
