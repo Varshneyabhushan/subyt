@@ -45,10 +45,11 @@ func MakeSyncVideosJob(
 		*checkPoint = newCheckPoint
 
 		//when pagination continues, sync shouldn't cool down
-		if len(response.NextPageToken) != 0 {
+		if len(checkPoint.NextPageToken) != 0 {
 			return delayTracker.Delay(), nil
 		}
 
+		log.Println("sync cool down")
 		return syncCoolDown, nil
 	}
 }
@@ -65,12 +66,18 @@ func NewCheckpoint(checkPoint storage.CheckPoint, response videofetcher.VideosRe
 		checkPoint.NextVideoLimit = response.Videos[0].VideoComparor
 	}
 
-	if totalValidVideos < len(response.Videos) {
-		checkPoint.VideoLimit = checkPoint.NextVideoLimit
-		checkPoint.NextVideoLimit = videosservice.VideoComparor{}
+	if totalValidVideos == len(response.Videos) {
+		checkPoint.NextPageToken = response.NextPageToken
+		return checkPoint, totalValidVideos
 	}
 
-	checkPoint.NextPageToken = response.NextPageToken
+	//don't go to next page
+	checkPoint.NextPageToken = ""
+	if totalValidVideos == 0 {
+		return checkPoint, 0
+	}
 
+	checkPoint.VideoLimit = checkPoint.NextVideoLimit
+	checkPoint.NextVideoLimit = videosservice.VideoComparor{}
 	return checkPoint, totalValidVideos
 }
