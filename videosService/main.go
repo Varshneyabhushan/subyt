@@ -5,7 +5,11 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"videosservice/addVideos"
 	"videosservice/env"
+	"videosservice/getVideos"
+	"videosservice/searchVideos"
+	"videosservice/videos"
 )
 
 func main() {
@@ -18,9 +22,11 @@ func main() {
 
 	router := httprouter.New()
 
-	//addVideosService := addVideos.NewMockAddVideosService(os.Stdout)
+	videoRepo := videos.NewMockRepository()
 
-	//router.POST("/videos", addVideos.MakeAddVideosEndpoint(addVideosService))
+	router.POST("/videos", addVideos.MakeEndpoint(videoRepo))
+	router.GET("/videos", getVideos.MakeEndpoint(videoRepo))
+	router.GET("/search", searchVideos.MakeEndpoint(videoRepo))
 
 	err = http.ListenAndServe(":"+strconv.Itoa(envConfig.ServerConfig.Port), router)
 	if err != nil {
