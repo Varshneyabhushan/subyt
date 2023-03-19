@@ -22,13 +22,17 @@ func (service VideosService) AddVideos(videos []Video) error {
 		return errors.New("error while marshalling : " + err.Error())
 	}
 
-	url := fmt.Sprintf("%s/videos", service.apiUrl)
-	_, err = http.Post(url, "application/json", bytes.NewBuffer(payload))
+	url := fmt.Sprintf("%s/", service.apiUrl)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(payload))
 	if err != nil {
-		return errors.New("error while sending request : " + err.Error())
+		return err
 	}
 
-	return err
+	if resp.StatusCode == 200 {
+		return nil
+	}
+
+	return HttpError(resp.StatusCode)
 }
 
 func NewVideoService(apiUrl string) VideosService {

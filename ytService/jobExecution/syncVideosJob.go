@@ -21,7 +21,8 @@ func MakeSyncVideosJob(
 
 	return func() (time.Duration, error) {
 
-		response, toDelay, err := fetchVideoResponse(*fetcher, checkPoint.NextPageToken, delayTracker)
+		//fetch videos from YouTube
+		response, toDelay, err := fetchVideoResponse(*fetcher, delayTracker, checkPoint.NextPageToken)
 		if err != nil || toDelay {
 			return delayTracker.Delay(), err
 		}
@@ -29,9 +30,9 @@ func MakeSyncVideosJob(
 		newCheckPoint, totalValidVideos := NewCheckpoint(*checkPoint, response)
 
 		//add videos to videosService
-		if err = service.AddVideos(response.Videos[:totalValidVideos]); err != nil {
-			log.Println("error while adding videos : " + err.Error())
-			return delayTracker.ProportionalDelay(), nil
+		delay, err := saveVideos(service, delayTracker, response.Videos[:totalValidVideos])
+		if delay || err != nil {
+			return delayTracker.Delay(), err
 		}
 
 		delayTracker.Reset()
@@ -50,30 +51,6 @@ func MakeSyncVideosJob(
 
 		return syncCoolDown, nil
 	}
-}
-
-func fetchVideoResponse(fetcher videofetcher.VideoFetcher, nextPageToken string,
-	tracker *DelayTracker) (videofetcher.VideosResponse, bool, error) {
-	response, err := fetcher.GetNext(nextPageToken)
-	if err != nil {
-		//if status is 4xx, requests has to be stopped
-		if response.Status >= 400 && response.Status < 410 {
-			return response, false, err
-		}
-
-		//client exhausted or server error
-		if response.Status == 429 || response.Status >= 500 {
-			log.Println("google server error : ", response.Status, err)
-			tracker.ExponentialBackOff()
-			return response, true, nil
-		}
-
-		log.Println("error while getting videos : ", err)
-		tracker.ProportionalDelay()
-		return response, true, nil
-	}
-
-	return response, false, nil
 }
 
 func NewCheckpoint(checkPoint storage.CheckPoint, response videofetcher.VideosResponse) (
