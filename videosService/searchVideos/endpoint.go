@@ -9,7 +9,7 @@ import (
 )
 
 type response struct {
-	videos []repository.Video
+	Videos []repository.Video
 }
 
 func MakeEndpoint(s Service) httprouter.Handle {
@@ -24,7 +24,7 @@ func MakeEndpoint(s Service) httprouter.Handle {
 		}
 
 		w.Header().Set("content-type", "application/json")
-		err = json.NewEncoder(w).Encode(response{videos: searchedVideos})
+		err = json.NewEncoder(w).Encode(response{Videos: searchedVideos})
 		if err != nil {
 			log.Fatal("error while sending response in searchVideos api : ", err)
 		}

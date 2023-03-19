@@ -17,13 +17,13 @@ func NewRepository(collection *mongo.Collection) *MongoRepository {
 	return &MongoRepository{collection: collection}
 }
 
-func (repo *MongoRepository) Get(skip, limit int64) ([]Video, error) {
+func (repo *MongoRepository) Get(skip, limit int64, sort bson.M) ([]Video, error) {
 	findOptions := options.Find().
 		SetSkip(skip).
 		SetLimit(limit).
-		SetSort(bson.M{"_id": -1})
+		SetSort(sort)
 
-	cursor, err := repo.collection.Find(context.TODO(), nil, findOptions)
+	cursor, err := repo.collection.Find(context.TODO(), bson.M{}, findOptions)
 	if err != nil {
 		return nil, err
 	}
