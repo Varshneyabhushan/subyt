@@ -9,6 +9,14 @@ func fetchVideoResponse(fetcher videofetcher.VideoFetcher, tracker *DelayTracker
 	nextPageToken string) (videofetcher.VideosResponse, bool, error) {
 	response, err := fetcher.GetNext(nextPageToken)
 	if err != nil {
+
+		//quota exceeded
+		if response.Status == 403 {
+			log.Println("quota exceeded for this api key")
+			tracker.ProportionalDelay()
+			return response, true, nil
+		}
+
 		//if status is 4xx, requests has to be stopped
 		if response.Status >= 400 && response.Status < 410 {
 			return response, false, err
