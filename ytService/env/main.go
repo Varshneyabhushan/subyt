@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"time"
 )
 
 type YoutubeSearchConfig struct {
@@ -13,8 +14,8 @@ type YoutubeSearchConfig struct {
 }
 
 type SchedulerConfig struct {
-	SyncCoolDown    int //in seconds
-	RequestCoolDown int //in seconds
+	SyncCoolDown    time.Duration //in seconds
+	RequestCoolDown time.Duration //in seconds
 }
 
 type Config struct {
@@ -30,5 +31,13 @@ func GetConfig() (result Config, err error) {
 		return result, errors.New("error while reading file : " + err.Error())
 	}
 
-	return result, json.Unmarshal(envBytes, &result)
+	err = json.Unmarshal(envBytes, &result)
+	if err != nil {
+		return result, err
+	}
+
+	//convert to seconds
+	result.Scheduler.SyncCoolDown *= time.Second
+	result.Scheduler.RequestCoolDown *= time.Second
+	return result, nil
 }
