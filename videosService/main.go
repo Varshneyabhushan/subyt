@@ -4,9 +4,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
-	"videosservice/addVideos"
 	"videosservice/env"
 )
 
@@ -20,9 +18,9 @@ func main() {
 
 	router := httprouter.New()
 
-	addVideosService := addVideos.NewMockAddVideosService(os.Stdout)
+	//addVideosService := addVideos.NewMockAddVideosService(os.Stdout)
 
-	router.POST("/videos", addVideos.MakeAddVideosEndpoint(addVideosService))
+	//router.POST("/videos", addVideos.MakeAddVideosEndpoint(addVideosService))
 
 	err = http.ListenAndServe(":"+strconv.Itoa(envConfig.ServerConfig.Port), router)
 	if err != nil {

@@ -1,4 +1,4 @@
-package addVideos
+package videos
 
 import "time"
 
