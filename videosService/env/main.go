@@ -10,8 +10,14 @@ type ServerConfig struct {
 	Port int
 }
 
+type MongoConfig struct {
+	Uri          string
+	DatabaseName string
+}
+
 type Config struct {
 	ServerConfig ServerConfig
+	MongoConfig  MongoConfig
 }
 
 func GetConfig() (result Config, err error) {
