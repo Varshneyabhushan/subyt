@@ -3,6 +3,7 @@ package videofetcher
 import (
 	"context"
 	"errors"
+	"google.golang.org/api/googleapi"
 	"ytservice/env"
 	"ytservice/videosservice"
 
@@ -56,7 +57,12 @@ func (fetcher *VideoFetcher) GetNext(nextPageToken string) (VideosResponse, erro
 
 	//TODO: handle errors according to the requirement
 	if err != nil {
-		return VideosResponse{}, errors.New("error while getting results from youtube" + err.Error())
+		if e, ok := err.(*googleapi.Error); ok {
+			return VideosResponse{Status: e.Code}, e
+		}
+
+		return VideosResponse{}, errors.New("error while getting results from youtube : " + err.
+			Error())
 	}
 
 	return toVideosResponse(response), nil
