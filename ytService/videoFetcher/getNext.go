@@ -30,13 +30,18 @@ func New(ctx context.Context, youtubeConfig env.YoutubeSearchConfig) (*VideoFetc
 }
 
 type VideosResponse struct {
+	Status        int
 	Videos        []videosservice.Video
 	NextPageToken string
 }
 
 func toVideosResponse(response *youtube.SearchListResponse) VideosResponse {
 	videos := parseVideos(response.Items)
-	return VideosResponse{videos, response.NextPageToken}
+	return VideosResponse{
+		Status:        response.HTTPStatusCode,
+		Videos:        videos,
+		NextPageToken: response.NextPageToken,
+	}
 }
 
 // GetNext gets the results from nextPage as long as nextPageToken is available
