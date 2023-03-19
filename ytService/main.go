@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 	"ytservice/env"
-	"ytservice/periodicjob"
+	"ytservice/jobexecution"
 	"ytservice/storage"
 	"ytservice/videofetcher"
 	"ytservice/videosservice"
@@ -30,5 +30,6 @@ func main() {
 
 	videosService := videosservice.NewVideoService(envConfig.VideoServiceURL)
 
-	periodicjob.StartSyncingVideos(checkPoint, fetcher, videosService, envConfig.Scheduler)
+	syncVideoJob := jobexecution.MakeSyncVideosJob(checkPoint, fetcher, videosService, envConfig.Scheduler)
+	log.Fatal(syncVideoJob.Execute())
 }

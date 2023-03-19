@@ -12,19 +12,20 @@ import (
 //so that the app is resilient
 //when app is abruptly shutdown, this helps restoring to previous check point
 
-// struct to be stored in json
+// CheckPoint struct to be stored in json
 type CheckPoint struct {
-	filePath      string
-	NextPageToken string
-	LimitVideo    videosservice.VideoComparor
+	filePath       string
+	VideoLimit     videosservice.VideoComparor
+	NextVideoLimit videosservice.VideoComparor
+	NextPageToken  string
 }
 
 var defaultLimitVideo, _ = time.Parse(time.RFC3339, "2023-03-10T00:00:00Z")
 
-func LoadCheckPoint(filePath string) (CheckPoint, error) {
-	newCheckPoint := CheckPoint{
+func LoadCheckPoint(filePath string) (*CheckPoint, error) {
+	newCheckPoint := &CheckPoint{
 		filePath: filePath,
-		LimitVideo: videosservice.VideoComparor{
+		VideoLimit: videosservice.VideoComparor{
 			PublishedAt: defaultLimitVideo,
 		},
 	}
@@ -34,11 +35,11 @@ func LoadCheckPoint(filePath string) (CheckPoint, error) {
 		return newCheckPoint, err
 	}
 
-	err = json.Unmarshal(bytes, &newCheckPoint)
+	err = json.Unmarshal(bytes, newCheckPoint)
 	return newCheckPoint, err
 }
 
-func (p CheckPoint) Save() error {
+func (p *CheckPoint) Save() error {
 	bytes, err := json.Marshal(p)
 	if err != nil {
 		return errors.New("error while converting to bytes : " + err.Error())
