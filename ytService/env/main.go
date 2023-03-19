@@ -13,7 +13,7 @@ type YoutubeSearchConfig struct {
 }
 
 type SchedulerConfig struct {
-	Period          int //in seconds
+	SyncCoolDown    int //in seconds
 	RequestCoolDown int //in seconds
 }
 
