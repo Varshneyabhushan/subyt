@@ -20,7 +20,6 @@ func saveVideos(service videosservice.VideosService, tracker *DelayTracker,
 			return false, errors.New("api not found")
 		}
 
-		tracker.ProportionalDelay()
 		log.Println("error while adding videos : " + err.Error())
 		return true, nil
 	}
