@@ -8,9 +8,7 @@ import (
 )
 
 func GetDatabase(config env.MongoConfig) (*mongo.Database, error) {
-	clientOptions := options.Client().
-		ApplyURI(config.Uri).SetConnectTimeout(config.ConnectionTimeout)
-
+	clientOptions := options.Client().ApplyURI(config.Uri)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		return nil, err

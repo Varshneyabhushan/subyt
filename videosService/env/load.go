@@ -5,7 +5,6 @@ import (
 	"errors"
 	"os"
 	"strconv"
-	"time"
 )
 
 type ServerConfig struct {
@@ -13,20 +12,18 @@ type ServerConfig struct {
 }
 
 type MongoConfig struct {
-	Uri               string
-	DatabaseName      string
-	ConnectionTimeout time.Duration //in seconds
+	Uri          string
+	DatabaseName string
 }
 
 type ElasticSearchConfig struct {
-	Uri               string
-	ConnectionTimeout time.Duration
+	Uri string
 }
 
 type Config struct {
-	ServerConfig
-	MongoConfig
-	ElasticSearchConfig
+	ServerConfig        `json:"serverConfig"`
+	MongoConfig         `json:"mongoConfig"`
+	ElasticSearchConfig `json:"elasticSearchConfig"`
 }
 
 const envFilePathKey = "ENV_FILEPATH"
@@ -53,7 +50,6 @@ func GetConfigFromFile(filePath string) (result Config, err error) {
 		return result, err
 	}
 
-	result.MongoConfig.ConnectionTimeout *= time.Second
 	return result, json.Unmarshal(envBytes, &result)
 }
 
@@ -63,14 +59,14 @@ func GetConfigFromEnv() (result Config, err error) {
 		return result, errors.New("error while reading PORT from env")
 	}
 
-	result.ServerConfig = ServerConfig{Port: port}
-
-	timeout, _ := strconv.Atoi(os.Getenv("MONGO_CONNECTION_TIMEOUT"))
-	result.MongoConfig = MongoConfig{
-		Uri:               os.Getenv("MONGO_URI"),
-		DatabaseName:      os.Getenv("MONGO_DATABASE"),
-		ConnectionTimeout: time.Duration(timeout) * time.Second,
-	}
-
-	return result, nil
+	return Config{
+		ServerConfig: ServerConfig{Port: port},
+		MongoConfig: MongoConfig{
+			Uri:          os.Getenv("MONGO_URI"),
+			DatabaseName: os.Getenv("MONGO_DATABASE"),
+		},
+		ElasticSearchConfig: ElasticSearchConfig{
+			Uri: os.Getenv("ELASTICSEARCH_URI"),
+		},
+	}, nil
 }
