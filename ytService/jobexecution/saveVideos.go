@@ -7,7 +7,7 @@ import (
 	"ytservice/videosservice"
 )
 
-func saveVideos(service videosservice.VideosService, tracker *DelayTracker,
+func saveVideos(service videosservice.VideosService, _ *DelayTracker,
 	videos []videosservice.Video) (bool, error) {
 	if err := service.AddVideos(videos); err != nil {
 		if errors.Is(err, syscall.ECONNREFUSED) ||
