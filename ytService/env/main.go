@@ -25,6 +25,17 @@ type Config struct {
 	VideoServiceURL string
 }
 
+const envFilePathKey = "ENV_FILEPATH"
+
+func LoadEnv() (Config, error) {
+	filePath := os.Getenv(envFilePathKey)
+	if len(filePath) == 0 {
+		return GetFromEnv(), nil
+	}
+
+	return GetConfigFromFile(filePath)
+}
+
 func GetConfigFromFile(filePath string) (result Config, err error) {
 	envBytes, err := os.ReadFile(filePath)
 	if err != nil {
@@ -39,5 +50,9 @@ func GetConfigFromFile(filePath string) (result Config, err error) {
 	//convert to seconds
 	result.Scheduler.SyncCoolDown *= time.Second
 	result.Scheduler.RequestCoolDown *= time.Second
+
+	//not sending in env
+	result.CheckPointPath = "checkPoint.json"
+
 	return result, nil
 }
