@@ -22,5 +22,6 @@ USER nonroot:nonroot
 ENTRYPOINT ["/ytService"]
 
 COPY env.json ./
+COPY checkPoint.json ./
 
 CMD [ "/ytService" ]
