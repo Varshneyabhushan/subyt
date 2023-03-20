@@ -1,0 +1,53 @@
+version: "3.4"
+
+services:
+  subyt.videosdb:
+    image: mongo
+    container_name: subyt.videosdb.instance
+
+    ports:
+      - 27017:27017
+
+    volumes:
+      - ~/Documents/subyt/database:/data/db
+
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=randomUser
+      - MONGO_INITDB_ROOT_PASSWORD=randomPassword
+      - MONGO_INITDB_DATABASE=videosService
+
+    networks:
+      - mongoNetwork
+
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh subyt.videosdb:27017 --quiet
+      retries: 5
+      interval: 5s
+      start_period: 30s
+
+  subyt.videosservice:
+    image: videosservice
+    container_name: subyt.videosservice.instance
+
+    ports:
+      - 3001:3001
+
+    build:
+      context: videosService
+
+    environment:
+      - PORT=3001
+      - MONGO_URI=mongodb://randomUser:randomPassword@subyt.videosdb:27017
+      - MONGO_DATABASE=videosService
+
+    depends_on:
+      subyt.videosdb:
+        condition: service_healthy
+
+    networks:
+      - mongoNetwork
+
+networks:
+   mongoNetwork:
+      name: mongo-network
+      driver: bridge
