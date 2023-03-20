@@ -8,6 +8,7 @@ import (
 	"videosservice/env"
 	"videosservice/httpServer"
 	"videosservice/repository"
+	"videosservice/repository/elasticsearch"
 	"videosservice/repository/mongo"
 	"videosservice/storage"
 )
@@ -28,8 +29,16 @@ func main() {
 	}
 	log.Println("database connection established")
 
+	esClient, err := storage.GetESClient(envConfig.ElasticSearchConfig)
+	if err != nil {
+		log.Fatal("error while getting esClinet : ", err)
+		return
+	}
+
 	videoRepository := mongo.NewRepository(database.Collection("videos"))
-	videosRepo := repository.NewCompositeRepository(videoRepository)
+	esRepository := elasticsearch.NewRepository(esClient)
+
+	videosRepo := repository.NewCompositeRepository(videoRepository, esRepository)
 
 	router := httpServer.MakeRouter(videosRepo)
 	address := fmt.Sprintf(":%s", strconv.Itoa(envConfig.ServerConfig.Port))

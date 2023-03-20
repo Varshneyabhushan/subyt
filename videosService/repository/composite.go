@@ -14,8 +14,14 @@ type CompositeRepository struct {
 	esRepository    *elasticsearch.Repository
 }
 
-func NewCompositeRepository(mongoRepository *mongo.MongoRepository) Repository {
-	return &CompositeRepository{mongoRepository: mongoRepository}
+func NewCompositeRepository(
+	mongoRepository *mongo.MongoRepository,
+	esRepository *elasticsearch.Repository,
+) Repository {
+	return &CompositeRepository{
+		mongoRepository: mongoRepository,
+		esRepository:    esRepository,
+	}
 }
 
 func (repo *CompositeRepository) Add(videos []Video) (int, error) {
