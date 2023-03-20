@@ -14,17 +14,19 @@ import (
 
 func main() {
 
-	envConfig, err := env.GetConfigFromFile("env.json")
+	envConfig, err := env.LoadEnv()
 	if err != nil {
-		log.Fatal("error while reading .env")
+		log.Fatal("error while reading .env", err)
 		return
 	}
+	log.Println("environmental variables loaded successfully")
 
 	database, err := storage.GetDatabase(envConfig.MongoConfig)
 	if err != nil {
 		log.Fatal("error while connecting to database : ", err)
 		return
 	}
+	log.Println("database connection established")
 
 	videoRepository := mongo.NewRepository(database.Collection("videos"))
 	videosRepo := repository.NewCompositeRepository(videoRepository)
