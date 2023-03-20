@@ -25,8 +25,8 @@ type Config struct {
 	VideoServiceURL string
 }
 
-func GetConfig() (result Config, err error) {
-	envBytes, err := os.ReadFile("env.json")
+func GetConfigFromFile(filePath string) (result Config, err error) {
+	envBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return result, errors.New("error while reading file : " + err.Error())
 	}

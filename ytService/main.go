@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	envConfig, err := env.GetConfig()
+	envConfig, err := env.GetConfigFromFile("env.json")
 	if err != nil {
 		log.Println("error while getting env : " + err.Error())
 		return
