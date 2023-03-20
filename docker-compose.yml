@@ -3,7 +3,7 @@ version: "3.4"
 services:
   subyt.videosdb:
     image: mongo
-    container_name: subyt.videosdb.instance
+    container_name: videosDb
 
     ports:
       - 27017:27017
@@ -27,7 +27,7 @@ services:
 
   subyt.videosservice:
     image: videosservice
-    container_name: subyt.videosservice.instance
+    container_name: videosService
 
     ports:
       - 3001:3001
@@ -46,6 +46,32 @@ services:
 
     networks:
       - mongoNetwork
+
+  subyt.ytservice:
+    image: ytservice
+    container_name: ytService
+
+    build:
+      context: ytService
+
+    environment:
+      - YOUTUBE_SEARCH_DEV_KEY=AIzaSyAIKdxKjTCEc6U45OZ5MTeVhhye2XtCJ9c
+      - YOUTUBE_SEARCH_QUERY=RRR Oscar
+      - SCHEDULER_SYNC_COOL_DOWN=30
+      - SCHEDULER_REQUEST_COOL_DOWN=10
+      - VIDEOS_SERVICE_URL=http://subyt.videosservice:3001
+
+    networks:
+      - mongoNetwork
+
+    depends_on:
+      subyt.videosdb:
+        condition: service_healthy
+
+    volumes:
+      - /Users/varshneyabhushan/repos/subyt/ytService/checkPoint.json:/checkPoint.json
+    
+
 
 networks:
    mongoNetwork:
