@@ -18,9 +18,15 @@ type MongoConfig struct {
 	ConnectionTimeout time.Duration //in seconds
 }
 
+type ElasticSearchConfig struct {
+	Uri               string
+	ConnectionTimeout time.Duration
+}
+
 type Config struct {
-	ServerConfig ServerConfig
-	MongoConfig  MongoConfig
+	ServerConfig
+	MongoConfig
+	ElasticSearchConfig
 }
 
 const envFilePathKey = "ENV_FILEPATH"

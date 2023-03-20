@@ -2,6 +2,8 @@ package repository
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"videosservice/repository/elasticsearch"
 	"videosservice/repository/mongo"
 )
 
@@ -9,6 +11,7 @@ import (
 // should implement all the functionalities using its sub repositories
 type CompositeRepository struct {
 	mongoRepository *mongo.MongoRepository
+	esRepository    *elasticsearch.Repository
 }
 
 func NewCompositeRepository(mongoRepository *mongo.MongoRepository) Repository {
@@ -30,14 +33,26 @@ func (repo *CompositeRepository) Get(skip, limit int64) ([]Video, error) {
 		return nil, err
 	}
 
-	var videos []Video
-	for _, mongoVideo := range mongoVideos {
-		videos = append(videos, ToVideo(mongoVideo))
-	}
-
-	return videos, nil
+	return ToVideos(mongoVideos), nil
 }
 
 func (repo *CompositeRepository) Search(term string) ([]Video, error) {
-	return []Video{}, nil
+	esVideos, err := repo.esRepository.Search(term)
+	if err != nil {
+		return nil, err
+	}
+
+	var ids []primitive.ObjectID
+	for _, esVideo := range esVideos {
+		if objectId, err := primitive.ObjectIDFromHex(esVideo.Id); err != nil {
+			ids = append(ids, objectId)
+		}
+	}
+
+	mongoVideos, err := repo.mongoRepository.FindByIds(ids)
+	if err != nil {
+		return nil, err
+	}
+
+	return ToVideos(mongoVideos), nil
 }

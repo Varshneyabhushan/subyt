@@ -29,6 +29,15 @@ func ToVideo(mongoVideo mongo.Video) Video {
 	}
 }
 
+func ToVideos(mongoVideos []mongo.Video) []Video {
+	var result []Video
+	for _, video := range mongoVideos {
+		result = append(result, ToVideo(video))
+	}
+
+	return result
+}
+
 type Repository interface {
 	Add(videos []Video) (int, error)
 	Get(skip, limit int64) ([]Video, error)
