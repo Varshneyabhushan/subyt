@@ -14,7 +14,7 @@ import (
 
 func main() {
 
-	envConfig, err := env.GetConfig()
+	envConfig, err := env.GetConfigFromFile("env.json")
 	if err != nil {
 		log.Fatal("error while reading .env")
 		return
