@@ -4,21 +4,19 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"videosservice/addVideos"
 	"videosservice/getVideos"
-	"videosservice/repository/elasticsearch"
 	"videosservice/searchVideos"
 
-	mongo2 "videosservice/repository/mongo"
-	es2 "videosservice/storageServices/elasticsearch"
+	"videosservice/storageServices/elasticsearch"
 	"videosservice/storageServices/mongo"
 )
 
 func MakeRouter(mongoService mongo.Service,
-	esService es2.Service) *httprouter.
+	esService elasticsearch.Service) *httprouter.
 	Router {
 	router := httprouter.New()
 
-	mongoVideosService := mongo.GetCollection[mongo2.Video](mongoService, "videos")
-	esVideosService := es2.GetIndex[elasticsearch.Video](esService, "videos")
+	mongoVideosService := mongo.GetCollection[mongo.Video](mongoService, "videos")
+	esVideosService := elasticsearch.GetIndex[elasticsearch.Video](esService, "videos")
 
 	addingService := addVideos.MakeAddService(mongoVideosService, esVideosService)
 	router.POST("/", addVideos.MakeEndpoint(addingService))

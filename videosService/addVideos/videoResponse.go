@@ -1,8 +1,8 @@
 package addVideos
 
 import (
-	"videosservice/repository/elasticsearch"
-	"videosservice/repository/mongo"
+	"videosservice/storageServices/elasticsearch"
+	"videosservice/storageServices/mongo"
 )
 
 type VideoResponse struct {

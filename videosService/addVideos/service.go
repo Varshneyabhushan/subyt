@@ -2,19 +2,17 @@ package addVideos
 
 import (
 	"log"
-	es2 "videosservice/repository/elasticsearch"
-	mongo2 "videosservice/repository/mongo"
 	"videosservice/storageServices/elasticsearch"
 	"videosservice/storageServices/mongo"
 )
 
 func MakeAddService(
-	mongoService mongo.Collection[mongo2.Video],
-	esService elasticsearch.Index[es2.Video],
+	mongoService mongo.Collection[mongo.Video],
+	esService elasticsearch.Index[elasticsearch.Video],
 ) Service {
 	return func(videos []VideoResponse) (int, error) {
-		var mongoVideos []mongo2.Video
-		var esVideos []es2.Video
+		var mongoVideos []mongo.Video
+		var esVideos []elasticsearch.Video
 		for _, video := range videos {
 			mongoVideos = append(mongoVideos, ToMongoVideo(video))
 			esVideos = append(esVideos, ToESVideo(video))

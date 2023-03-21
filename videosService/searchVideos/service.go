@@ -2,15 +2,13 @@ package searchVideos
 
 import (
 	"videosservice/addVideos"
-	"videosservice/repository/elasticsearch"
-	mongo2 "videosservice/repository/mongo"
 	elasticsearch2 "videosservice/storageServices/elasticsearch"
 	"videosservice/storageServices/mongo"
 )
 
 func MakeSearchService(
-	mongoService mongo.Collection[mongo2.Video],
-	esService elasticsearch2.Index[elasticsearch.Video],
+	mongoService mongo.Collection[mongo.Video],
+	esService elasticsearch2.Index[elasticsearch2.Video],
 ) Service {
 	return func(term string, skip, limit int) ([]addVideos.VideoResponse, error) {
 		var result []addVideos.VideoResponse
