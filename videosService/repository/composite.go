@@ -65,7 +65,7 @@ func (repo *CompositeRepository) Search(term string) ([]Video, error) {
 
 	var ids []primitive.ObjectID
 	for _, esVideo := range esVideos {
-		if objectId, err := primitive.ObjectIDFromHex(esVideo.Id); err != nil {
+		if objectId, err := primitive.ObjectIDFromHex(esVideo.Id); err == nil {
 			ids = append(ids, objectId)
 		}
 	}
