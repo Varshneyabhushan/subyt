@@ -7,6 +7,8 @@ import (
 	"errors"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esutil"
+	"io"
+	"log"
 	"strconv"
 )
 
@@ -51,6 +53,70 @@ func (repo *Repository) Add(esVideos []Video) error {
 	return nil
 }
 
-func (repo *Repository) Search(_ string) ([]Video, error) {
-	return nil, nil
+type EsHit struct {
+	Id     string  `json:"_id"`
+	Score  float64 `json:"_score"`
+	Source Video   `json:"_source"`
+}
+
+type HitsResult struct {
+	Total struct{ Value int }
+	Hits  []EsHit
+}
+
+type queryResponse struct {
+	Took     int
+	TimedOut bool `json:"timed_out"`
+	Hits     HitsResult
+}
+
+func GetResultFromResponse(response queryResponse) []Video {
+	var result []Video
+	for _, hit := range response.Hits.Hits {
+		result = append(result, hit.Source)
+	}
+
+	return result
+}
+
+func (repo *Repository) Search(term string) ([]Video, error) {
+	search := repo.esClient.Search
+
+	var buf bytes.Buffer
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"match": map[string]interface{}{
+				"Title": term,
+			},
+		},
+	}
+
+	if err := json.NewEncoder(&buf).Encode(query); err != nil {
+		return nil, errors.New("Error encoding query: " + err.Error())
+	}
+
+	response, err := search(
+		search.WithIndex("videos"),
+		search.WithBody(&buf),
+		search.WithPretty(),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	responseBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, errors.New("error while reading response : " + err.Error())
+	}
+
+	log.Println(string(responseBytes))
+
+	var esResult queryResponse
+	err = json.Unmarshal(responseBytes, &esResult)
+	if err != nil {
+		return nil, errors.New("error while reading result : " + err.Error())
+	}
+
+	return GetResultFromResponse(esResult), nil
 }
