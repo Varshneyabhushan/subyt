@@ -79,7 +79,7 @@ func GetResultFromResponse(response queryResponse) []Video {
 	return result
 }
 
-func (repo *Repository) Search(term string) ([]Video, error) {
+func (repo *Repository) Search(term string, skip, limit int) ([]Video, error) {
 	search := repo.esClient.Search
 
 	var buf bytes.Buffer
@@ -89,6 +89,8 @@ func (repo *Repository) Search(term string) ([]Video, error) {
 				"Title": term,
 			},
 		},
+		"from": skip,
+		"size": limit,
 	}
 
 	if err := json.NewEncoder(&buf).Encode(query); err != nil {

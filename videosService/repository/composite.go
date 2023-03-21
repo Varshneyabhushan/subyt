@@ -57,8 +57,8 @@ func (repo *CompositeRepository) Get(skip, limit int64) ([]Video, error) {
 	return ToVideos(mongoVideos), nil
 }
 
-func (repo *CompositeRepository) Search(term string) ([]Video, error) {
-	esVideos, err := repo.esRepository.Search(term)
+func (repo *CompositeRepository) Search(term string, skip, limit int) ([]Video, error) {
+	esVideos, err := repo.esRepository.Search(term, skip, limit)
 	if err != nil || len(esVideos) == 0 {
 		return []Video{}, err
 	}

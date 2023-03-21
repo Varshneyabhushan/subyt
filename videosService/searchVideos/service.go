@@ -5,5 +5,5 @@ import (
 )
 
 type Service interface {
-	Search(term string) ([]repository.Video, error)
+	Search(term string, skip, limit int) ([]repository.Video, error)
 }

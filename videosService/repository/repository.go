@@ -51,5 +51,5 @@ func ToVideos(mongoVideos []mongo.Video) []Video {
 type Repository interface {
 	Add(videos []Video) (int, error)
 	Get(skip, limit int64) ([]Video, error)
-	Search(term string) ([]Video, error)
+	Search(term string, skip, limit int) ([]Video, error)
 }

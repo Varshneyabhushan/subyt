@@ -5,6 +5,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+	"strconv"
 	"videosservice/repository"
 )
 
@@ -18,7 +19,16 @@ func MakeEndpoint(s Service) httprouter.Handle {
 		query := r.URL.Query()
 		term := query.Get("term")
 
-		searchedVideos, err := s.Search(term)
+		skipString := query.Get("skip")
+		limitString := query.Get("limit")
+
+		skip, _ := strconv.Atoi(skipString)
+		limit, err := strconv.Atoi(limitString)
+		if err != nil {
+			limit = 10
+		}
+
+		searchedVideos, err := s.Search(term, skip, limit)
 		if err != nil {
 			http.Error(w, "error while getting searchedVideos : "+err.Error(), http.StatusBadRequest)
 			return
