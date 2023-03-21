@@ -8,7 +8,6 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esutil"
 	"io"
-	"log"
 	"strconv"
 )
 
@@ -65,14 +64,14 @@ type HitsResult struct {
 }
 
 type queryResponse struct {
-	Took     int
-	TimedOut bool `json:"timed_out"`
-	Hits     HitsResult
+	Took       int
+	TimedOut   bool       `json:"timed_out"`
+	HitsResult HitsResult `json:"hits"`
 }
 
 func GetResultFromResponse(response queryResponse) []Video {
 	var result []Video
-	for _, hit := range response.Hits.Hits {
+	for _, hit := range response.HitsResult.Hits {
 		result = append(result, hit.Source)
 	}
 
@@ -111,8 +110,6 @@ func (repo *Repository) Search(term string, skip, limit int) ([]Video, error) {
 	if err != nil {
 		return nil, errors.New("error while reading response : " + err.Error())
 	}
-
-	log.Println(string(responseBytes))
 
 	var esResult queryResponse
 	err = json.Unmarshal(responseBytes, &esResult)

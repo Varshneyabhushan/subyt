@@ -2,7 +2,6 @@ package repository
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"videosservice/repository/elasticsearch"
 	"videosservice/repository/mongo"
@@ -29,12 +28,8 @@ func (repo *CompositeRepository) Add(videos []Video) (int, error) {
 	var mongoVideos []mongo.Video
 	var esVideos []elasticsearch.Video
 	for _, video := range videos {
-		newId := primitive.NewObjectID()
-		curMongoVideo := mongoVideo(video)
-		curMongoVideo.Id = newId
-
-		mongoVideos = append(mongoVideos, curMongoVideo)
-		esVideos = append(esVideos, esVideo(newId, video))
+		mongoVideos = append(mongoVideos, toMongoVideo(video))
+		esVideos = append(esVideos, toEsVideo(video))
 	}
 
 	//add videos to es in background
@@ -63,11 +58,9 @@ func (repo *CompositeRepository) Search(term string, skip, limit int) ([]Video, 
 		return []Video{}, err
 	}
 
-	var ids []primitive.ObjectID
+	var ids []string
 	for _, esVideo := range esVideos {
-		if objectId, err := primitive.ObjectIDFromHex(esVideo.Id); err == nil {
-			ids = append(ids, objectId)
-		}
+		ids = append(ids, esVideo.Id)
 	}
 
 	mongoVideos, err := repo.mongoRepository.FindByIds(ids)

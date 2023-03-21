@@ -3,7 +3,6 @@ package mongo
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -45,9 +44,11 @@ func (repo *MongoRepository) Add(newDocs []Video) (int, error) {
 	return len(result.InsertedIDs), nil
 }
 
-func (repo *MongoRepository) FindByIds(ids []primitive.ObjectID) ([]Video, error) {
+// FindByIds finds by youtubeIds
+// TODO index based on ytid
+func (repo *MongoRepository) FindByIds(ids []string) ([]Video, error) {
 	filter := bson.M{
-		"_id": bson.M{
+		"ytid": bson.M{
 			"$in": ids,
 		},
 	}
