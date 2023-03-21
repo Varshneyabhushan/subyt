@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"videosservice/repository/elasticsearch"
 	"videosservice/repository/mongo"
 )
 
@@ -17,6 +19,14 @@ func mongoVideo(video Video) mongo.Video {
 		Properties: video.Properties,
 		Channel:    video.Channel,
 		Thumbnails: video.Thumbnails,
+	}
+}
+
+func esVideo(Id primitive.ObjectID, video Video) elasticsearch.Video {
+	return elasticsearch.Video{
+		Id:          Id.String(),
+		Title:       video.Title,
+		Description: video.Description,
 	}
 }
 

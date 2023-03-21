@@ -3,6 +3,7 @@ package repository
 import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"log"
 	"videosservice/repository/elasticsearch"
 	"videosservice/repository/mongo"
 )
@@ -26,9 +27,23 @@ func NewCompositeRepository(
 
 func (repo *CompositeRepository) Add(videos []Video) (int, error) {
 	var mongoVideos []mongo.Video
+	var esVideos []elasticsearch.Video
 	for _, video := range videos {
-		mongoVideos = append(mongoVideos, mongoVideo(video))
+		newId := primitive.NewObjectID()
+		curMongoVideo := mongoVideo(video)
+		curMongoVideo.Id = newId
+
+		mongoVideos = append(mongoVideos, curMongoVideo)
+		esVideos = append(esVideos, esVideo(newId, video))
 	}
+
+	//add videos to es in background
+	go func() {
+		err := repo.esRepository.Add(esVideos)
+		if err != nil {
+			log.Println("error while adding videos to es : ", err)
+		}
+	}()
 
 	return repo.mongoRepository.Add(mongoVideos)
 }
