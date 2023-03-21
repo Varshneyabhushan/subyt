@@ -34,6 +34,7 @@ func main() {
 		log.Fatal("error while getting esClinet : ", err)
 		return
 	}
+	log.Println("es connection established")
 
 	videoRepository := mongo.NewRepository(database.Collection("videos"))
 	esRepository := elasticsearch.NewRepository(esClient)
