@@ -21,6 +21,7 @@ func MakeEndpoint(s Service) httprouter.Handle {
 		searchedVideos, err := s.Search(term)
 		if err != nil {
 			http.Error(w, "error while getting searchedVideos : "+err.Error(), http.StatusBadRequest)
+			return
 		}
 
 		w.Header().Set("content-type", "application/json")

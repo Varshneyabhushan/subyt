@@ -59,8 +59,8 @@ func (repo *CompositeRepository) Get(skip, limit int64) ([]Video, error) {
 
 func (repo *CompositeRepository) Search(term string) ([]Video, error) {
 	esVideos, err := repo.esRepository.Search(term)
-	if err != nil {
-		return nil, err
+	if err != nil || len(esVideos) == 0 {
+		return []Video{}, err
 	}
 
 	var ids []primitive.ObjectID
