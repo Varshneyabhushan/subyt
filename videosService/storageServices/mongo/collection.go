@@ -8,35 +8,32 @@ import (
 	"log"
 )
 
-type MongoRepository struct {
+type Collection[T interface{}] struct {
 	collection *mongo.Collection
 }
 
-func NewRepository(collection *mongo.Collection) *MongoRepository {
-	return &MongoRepository{collection: collection}
-}
-
-func (repo *MongoRepository) Get(skip, limit int64, sort bson.M) ([]Video, error) {
+// collection: client.Database(config.DatabaseName).Collection(collectionName),
+func (col *Collection[T]) Get(skip, limit int64, sort bson.M) ([]T, error) {
 	findOptions := options.Find().
 		SetSkip(skip).
 		SetLimit(limit).
 		SetSort(sort)
 
-	cursor, err := repo.collection.Find(context.TODO(), bson.M{}, findOptions)
+	cursor, err := col.collection.Find(context.TODO(), bson.M{}, findOptions)
 	if err != nil {
 		return nil, err
 	}
 
-	return getDocumentsFromCursor(cursor), nil
+	return getDocumentsFromCursor[T](cursor), nil
 }
 
-func (repo *MongoRepository) Add(newDocs []Video) (int, error) {
+func (col *Collection[T]) Add(newDocs []T) (int, error) {
 	var addingDocs []interface{}
 	for _, newDoc := range newDocs {
 		addingDocs = append(addingDocs, newDoc)
 	}
 
-	result, err := repo.collection.InsertMany(context.TODO(), addingDocs, nil)
+	result, err := col.collection.InsertMany(context.TODO(), addingDocs, nil)
 	if err != nil {
 		return 0, err
 	}
@@ -44,27 +41,26 @@ func (repo *MongoRepository) Add(newDocs []Video) (int, error) {
 	return len(result.InsertedIDs), nil
 }
 
-// FindByIds finds by youtubeIds
 // TODO index based on ytid
-func (repo *MongoRepository) FindByIds(ids []string) ([]Video, error) {
+func (col *Collection[T]) FindByKey(key string, vals []string) ([]T, error) {
 	filter := bson.M{
-		"ytid": bson.M{
-			"$in": ids,
+		key: bson.M{
+			"$in": vals,
 		},
 	}
 
-	cursor, err := repo.collection.Find(context.TODO(), filter, nil)
+	cursor, err := col.collection.Find(context.TODO(), filter, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return getDocumentsFromCursor(cursor), nil
+	return getDocumentsFromCursor[T](cursor), nil
 }
 
-func getDocumentsFromCursor(cursor *mongo.Cursor) []Video {
-	var result []Video
+func getDocumentsFromCursor[T interface{}](cursor *mongo.Cursor) []T {
+	var result []T
 	for cursor.Next(context.TODO()) {
-		var currentResult Video
+		var currentResult T
 		err := bson.Unmarshal(cursor.Current, &currentResult)
 		if err != nil {
 			log.Fatal("error while marshalling into T", cursor.Current.String())

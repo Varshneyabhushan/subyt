@@ -8,36 +8,36 @@ import (
 	"io"
 )
 
-type EsHit struct {
+type EsHit[T interface{}] struct {
 	Id     string  `json:"_id"`
 	Score  float64 `json:"_score"`
-	Source Video   `json:"_source"`
+	Source T       `json:"_source"`
 }
 
-type HitsResult struct {
+type HitsResult[T interface{}] struct {
 	Total struct{ Value int }
-	Hits  []EsHit
+	Hits  []EsHit[T]
 }
 
-type queryResponse struct {
+type queryResponse[T interface{}] struct {
 	Took       int
-	TimedOut   bool       `json:"timed_out"`
-	HitsResult HitsResult `json:"hits"`
+	TimedOut   bool          `json:"timed_out"`
+	HitsResult HitsResult[T] `json:"hits"`
 }
 
-func GetVideosFromResponse(response *esapi.Response) ([]Video, error) {
+func GetDocsFromResponse[T interface{}](response *esapi.Response) ([]T, error) {
 	responseBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, errors.New("error while reading response : " + err.Error())
 	}
 
-	var esResult queryResponse
+	var esResult queryResponse[T]
 	err = json.Unmarshal(responseBytes, &esResult)
 	if err != nil {
 		return nil, errors.New("error while reading result : " + err.Error())
 	}
 
-	var result []Video
+	var result []T
 	for _, hit := range esResult.HitsResult.Hits {
 		result = append(result, hit.Source)
 	}
@@ -57,18 +57,18 @@ func buildQuery(term string, skip int, limit int) any {
 	}
 }
 
-func (repo *Repository) Search(term string, skip, limit int) ([]Video, error) {
+func (service *Index[T]) Search(term string, skip, limit int) ([]T, error) {
 	var buf bytes.Buffer
 	query := buildQuery(term, skip, limit)
 	if err := json.NewEncoder(&buf).Encode(query); err != nil {
 		return nil, errors.New("Error encoding query: " + err.Error())
 	}
 
-	search := repo.esClient.Search
-	response, err := search(search.WithIndex("videos"), search.WithBody(&buf))
+	search := service.esClient.Search
+	response, err := search(search.WithIndex(service.indexName), search.WithBody(&buf))
 	if err != nil {
 		return nil, err
 	}
 
-	return GetVideosFromResponse(response)
+	return GetDocsFromResponse[T](response)
 }

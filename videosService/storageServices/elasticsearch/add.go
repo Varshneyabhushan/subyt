@@ -10,11 +10,12 @@ import (
 	"strconv"
 )
 
-func newBulkIndexer(client *elasticsearch.Client) (esutil.BulkIndexer, func() error) {
+func newBulkIndexer(client *elasticsearch.Client, indexName string) (esutil.BulkIndexer,
+	func() error) {
 	bulkIndexer, _ := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
 		NumWorkers: 1,
 		Client:     client,
-		Index:      "videos",
+		Index:      indexName,
 	})
 
 	closeIndexer := func() error {
@@ -28,19 +29,19 @@ func newBulkIndexer(client *elasticsearch.Client) (esutil.BulkIndexer, func() er
 	return bulkIndexer, closeIndexer
 }
 
-func addVideoToBulkIndexer(indexer esutil.BulkIndexer, esVideo Video) error {
-	esVideoBytes, _ := json.Marshal(esVideo)
+func addDocToBulkIndexer[T Document](indexer esutil.BulkIndexer, doc T) error {
+	docBytes, _ := json.Marshal(doc)
 	return indexer.Add(context.Background(), esutil.BulkIndexerItem{
 		Action:     "index",
-		DocumentID: esVideo.Id,
-		Body:       bytes.NewReader(esVideoBytes),
+		DocumentID: doc.GetId(),
+		Body:       bytes.NewReader(docBytes),
 	})
 }
 
-func (repo *Repository) Add(esVideos []Video) error {
-	bulkIndexer, closeIndex := newBulkIndexer(repo.esClient)
-	for _, esVideo := range esVideos {
-		if err := addVideoToBulkIndexer(bulkIndexer, esVideo); err != nil {
+func (service *Index[T]) Add(documents []T) error {
+	bulkIndexer, closeIndex := newBulkIndexer(service.esClient, service.indexName)
+	for _, doc := range documents {
+		if err := addDocToBulkIndexer(bulkIndexer, doc); err != nil {
 			return errors.New("unexpected error : " + err.Error())
 		}
 	}

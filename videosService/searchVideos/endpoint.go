@@ -6,14 +6,16 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"videosservice/repository"
+	"videosservice/addVideos"
 )
 
 type response struct {
-	Videos []repository.Video
+	Videos []addVideos.VideoResponse
 }
 
-func MakeEndpoint(s Service) httprouter.Handle {
+type Service func(term string, skip, limit int) ([]addVideos.VideoResponse, error)
+
+func MakeEndpoint(search Service) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 		query := r.URL.Query()
@@ -28,7 +30,7 @@ func MakeEndpoint(s Service) httprouter.Handle {
 			limit = 10
 		}
 
-		searchedVideos, err := s.Search(term, skip, limit)
+		searchedVideos, err := search(term, skip, limit)
 		if err != nil {
 			http.Error(w, "error while getting searchedVideos : "+err.Error(), http.StatusBadRequest)
 			return

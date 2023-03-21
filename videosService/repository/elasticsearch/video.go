@@ -6,3 +6,7 @@ type Video struct {
 	Description  string
 	ChannelTitle string
 }
+
+func (esVideo Video) GetId() string {
+	return esVideo.Id
+}
