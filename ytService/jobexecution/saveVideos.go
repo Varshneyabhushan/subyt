@@ -20,6 +20,11 @@ func saveVideos(service videosservice.VideosService, _ *DelayTracker,
 			return false, errors.New("api not found")
 		}
 
+		if errors.Is(err, videosservice.HttpError(400)) {
+			log.Println("bad request to videosService : " + err.Error())
+			return false, nil
+		}
+
 		log.Println("error while adding videos : " + err.Error())
 		return true, nil
 	}
