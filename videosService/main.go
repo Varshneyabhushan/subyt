@@ -27,6 +27,12 @@ func main() {
 	}
 	log.Println("database connection established")
 
+	if err := mongo.InitIndexes(mongoService); err != nil {
+		log.Fatal("error while creating mongo indexes : ", err)
+		return
+	}
+	log.Println("mongo indexes are created")
+
 	esService, err := elasticsearch.NewService(envConfig.ElasticSearchConfig)
 	if err != nil {
 		log.Fatal("error while getting esClinet : ", err)

@@ -18,6 +18,11 @@ func MakeAddService(
 			esVideos = append(esVideos, ToESVideo(video))
 		}
 
+		count, err := mongoService.Add(mongoVideos)
+		if err != nil {
+			return count, err
+		}
+
 		//add videos to es in background
 		go func() {
 			err := esService.Add(esVideos)
@@ -26,6 +31,6 @@ func MakeAddService(
 			}
 		}()
 
-		return mongoService.Add(mongoVideos)
+		return count, nil
 	}
 }
