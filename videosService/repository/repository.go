@@ -24,7 +24,7 @@ func mongoVideo(video Video) mongo.Video {
 
 func esVideo(Id primitive.ObjectID, video Video) elasticsearch.Video {
 	return elasticsearch.Video{
-		Id:          Id.String(),
+		Id:          Id.Hex(),
 		Title:       video.Title,
 		Description: video.Description,
 	}
