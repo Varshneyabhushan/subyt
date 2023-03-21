@@ -16,9 +16,10 @@ func toMongoVideo(video Video) mongo.Video {
 
 func toEsVideo(video Video) elasticsearch.Video {
 	return elasticsearch.Video{
-		Id:          video.Id,
-		Title:       video.Title,
-		Description: video.Description,
+		Id:           video.Id,
+		Title:        video.Title,
+		Description:  video.Description,
+		ChannelTitle: video.Channel.Title,
 	}
 }
 
