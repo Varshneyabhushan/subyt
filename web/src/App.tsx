@@ -13,7 +13,7 @@ const darkTheme = createTheme({
   },
 });
 
-const config : VideosServiceConfig = { apiUrl : "http://localhost:3000" } 
+const config : VideosServiceConfig = { apiUrl : "http://localhost:3001" } 
 const videosService = new VideosService(config)
 
 function App() {

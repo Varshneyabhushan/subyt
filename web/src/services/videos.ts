@@ -1,3 +1,4 @@
+import axios, { AxiosInstance } from "axios";
 import videosResource from "./videosResource";
 
 export interface VideosServiceConfig {
@@ -30,13 +31,24 @@ export interface VideoResource {
   }
 
 export default class VideosService {
-    apiUrl = ""
+    axios : AxiosInstance
     constructor(config : VideosServiceConfig) {
-        this.apiUrl = config.apiUrl
+        this.axios = axios.create({
+            baseURL : config.apiUrl,
+            validateStatus(status) {
+               return status >= 200 && status < 500;
+            },
+         });
     }
 
     getVideos(skip : number, limit : number) : VideoResource {
-        return videosResource(Promise.reject("not yet implemented"))
+        let provider = this.axios.get(`?skip=${skip}&limit=${limit}`)
+            .then(res => {
+                console.log(res.data)
+                return res.data.Videos
+            })
+
+        return videosResource(provider)
     }
 
     searchVideos(term : string, skip : number, limit : number) : VideoResource {
