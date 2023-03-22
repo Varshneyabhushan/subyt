@@ -15,7 +15,7 @@ export default function VideosList({ resource } : CustomImageListProps) {
   return (
     <ImageList cols={4} gap={5} sx={{ paddingLeft : "15px", paddingRight : "15px" }}>
       {videos.map((item) => (
-        <ImageListItem key={item.Id}>
+        <ImageListItem key={item.Id} sx={{ width : 220 }}>
           <img
             src={`${item.Thumbnails[0].Url}`}
             // srcSet={`${item.thumbnail}?w=248&fit=crop&auto=format&dpr=2 2x`}
