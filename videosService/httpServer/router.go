@@ -2,6 +2,7 @@ package httpServer
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"net/http"
 	"videosservice/addVideos"
 	"videosservice/getVideos"
 	"videosservice/searchVideos"
@@ -9,6 +10,14 @@ import (
 	"videosservice/storageServices/elasticsearch"
 	"videosservice/storageServices/mongo"
 )
+
+func cors(next httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter,
+		r *http.Request, ps httprouter.Params) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		next(w, r, ps)
+	}
+}
 
 func MakeRouter(mongoService mongo.Service,
 	esService elasticsearch.Service) *httprouter.
@@ -22,10 +31,10 @@ func MakeRouter(mongoService mongo.Service,
 	router.POST("/", addVideos.MakeEndpoint(addingService))
 
 	gettingService := getVideos.MakeGetVideosService(mongoVideosService)
-	router.GET("/", getVideos.MakeEndpoint(gettingService))
+	router.GET("/", cors(getVideos.MakeEndpoint(gettingService)))
 
 	searchingService := searchVideos.MakeSearchService(mongoVideosService, esVideosService)
-	router.GET("/search", searchVideos.MakeEndpoint(searchingService))
+	router.GET("/search", cors(searchVideos.MakeEndpoint(searchingService)))
 
 	return router
 }
