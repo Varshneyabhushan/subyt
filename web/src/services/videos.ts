@@ -1,11 +1,33 @@
+import videosResource from "./videosResource";
 
-interface VideosServiceConfig {
+export interface VideosServiceConfig {
     apiUrl : string;
 }
 
-interface Video {
-    id : string;
+interface Channel {
+    Id : string;
+    Title : string;
 }
+
+interface Thumbnail {
+    Width : number;
+    Height : number;
+    Url : string;
+}
+
+export interface Video {
+    Id : string;
+    Title : string;
+    Description : string;
+    PublishedAt : Date;
+    CreatedAt : Date;
+    Channel : Channel;
+    Thumbnails : Thumbnail[];
+}
+
+export interface VideoResource {
+    read() : Video[];
+  }
 
 export default class VideosService {
     apiUrl = ""
@@ -13,11 +35,11 @@ export default class VideosService {
         this.apiUrl = config.apiUrl
     }
 
-    getVideos(skip : number, limit : number) : Promise<Video[]> {
-        return Promise.reject("not yet implemented")
+    getVideos(skip : number, limit : number) : VideoResource {
+        return videosResource(Promise.reject("not yet implemented"))
     }
 
-    searchVideos(skip : number, limit : number) : Promise<Video[]> {
-        return Promise.reject("not yet implemented")
+    searchVideos(term : string, skip : number, limit : number) : VideoResource {
+        return videosResource(Promise.reject("not yet implemented"))
     }
 }
