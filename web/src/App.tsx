@@ -4,7 +4,7 @@ import { Container, CssBaseline, Pagination, Stack, useStepContext } from '@mui/
 import Header from './Header';
 import VideosList from './VideosList';
 import { Suspense, useEffect, useState } from 'react';
-import VideosService, { VideosServiceConfig, VideoResource } from './services/videos';
+import VideosService, { VideosServiceConfig, VideoResource, CountResource } from './services/videos';
 import ErrorBoundary from './Components/ErrorBoundary';
 import videosResource from './services/videosResource';
 import { FmdBadTwoTone } from '@mui/icons-material';
@@ -20,11 +20,13 @@ const videosService = new VideosService(config)
 
 const videosPerPage = 20
 const initialVideos = videosService.getVideos(0, videosPerPage)
+const videosCount = videosService.getVideosCount()
 
 function App() {
 
-  const [resource, setResource] = useState<VideoResource>(initialVideos)
-  const [videosCount, setVideosCount] = useState(100)
+  const [videoResource, setVideoResource] = useState<VideoResource>(initialVideos)
+  const [countResource, setCountResource] = useState<CountResource>(videosCount)
+
   const [page, setPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -32,18 +34,22 @@ function App() {
   const [currentContext, setCurrentContext] = useState(false)
 
   useEffect(() => {
-    let skip = (page - 1)* videosPerPage
+    let skip = (page - 1) * videosPerPage
+    //home page
+    if(currentContext) {
+      let [countResource, videosResource] = videosService.searchVideos(searchTerm, skip, videosPerPage)
+      setCountResource(countResource)
+      setVideoResource(videosResource)
+      return
+    }
 
-    //home page vs search page
-    let newResource = (currentContext) ? 
-      videosService.searchVideos(searchTerm, skip, videosPerPage) : 
-      videosService.getVideos(skip, videosPerPage);
-
-    setResource(newResource)
+    //search page
+    let videoResource = videosService.getVideos(skip, videosPerPage);
+    setVideoResource(videoResource)
   },
-  [page, setResource, searchTerm, currentContext])
+    [page, setVideoResource, searchTerm, currentContext])
 
-  function initSearch(term : string) {
+  function initSearch(term: string) {
     setSearchTerm(term)
     setPage(1)
     setCurrentContext(true)
@@ -57,19 +63,23 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Header initSearch={initSearch} goHome={goHome}/>
-      <Pagination 
-        count={Math.ceil(videosCount/20)} 
-        page={page} 
-        onChange={(_, pageNumber) => setPage(pageNumber)} 
-        shape="rounded"/>
+      <Header initSearch={initSearch} goHome={goHome} />
+      <ErrorBoundary fallback={"error loading count"}>
+        <Suspense fallback={"loading..."}>
+          <Pagination
+            count={Math.ceil(countResource.read() / 20)}
+            page={page}
+            onChange={(_, pageNumber) => setPage(pageNumber)}
+            shape="rounded" />
+        </Suspense>
+      </ErrorBoundary>
       <Container disableGutters sx={{
         overflow: "auto",
         maxHeight: "91vh",
       }}>
         <ErrorBoundary fallback={"error while loading videos"}>
           <Suspense fallback={<h1> Loading </h1>}>
-              <VideosList resource={resource} />
+            <VideosList resource={videoResource} />
           </Suspense>
         </ErrorBoundary>
       </Container>
