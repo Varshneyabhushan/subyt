@@ -3,8 +3,8 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Container, CssBaseline } from '@mui/material';
 import Header from './Header';
 import VideosList from './VideosList';
-import { Suspense, useEffect, useState } from 'react';
-import VideosService, { VideosServiceConfig, Video, VideoResource } from './services/videos';
+import { Suspense, useState } from 'react';
+import VideosService, { VideosServiceConfig, VideoResource } from './services/videos';
 import ErrorBoundary from './Components/ErrorBoundary';
 
 const darkTheme = createTheme({
@@ -13,13 +13,15 @@ const darkTheme = createTheme({
   },
 });
 
-const config : VideosServiceConfig = { apiUrl : "http://localhost:3001" } 
+const config: VideosServiceConfig = { apiUrl: "http://localhost:3001" }
 const videosService = new VideosService(config)
+
+const initialVideos = videosService.getVideos(0, 20)
 
 function App() {
 
-  const [resource, setResource] = useState<VideoResource>(videosService.getVideos(0, 20))
-  
+  const [resource, setResource] = useState<VideoResource>(initialVideos)
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -28,11 +30,11 @@ function App() {
         overflow: "auto",
         maxHeight: "91vh",
       }}>
-        <Suspense fallback={ <h1> Loading </h1>}>
         <ErrorBoundary fallback={"error while loading videos"}>
-            <VideosList resource={resource} />
+          <Suspense fallback={<h1> Loading </h1>}>
+              <VideosList resource={resource} />
+          </Suspense>
         </ErrorBoundary>
-        </Suspense>
       </Container>
     </ThemeProvider>
   );

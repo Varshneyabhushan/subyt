@@ -2,7 +2,7 @@
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar'
-import { Video, VideoResource } from '../services/videos';
+import { VideoResource } from '../services/videos';
 
 
 interface CustomImageListProps {
