@@ -17,11 +17,7 @@ func main() {
 		return
 	}
 
-	checkPoint, err := storage.LoadCheckPoint(envConfig.CheckPointPath)
-	if err != nil {
-		log.Fatal("error while loading checkpoint", err)
-	}
-
+	checkPoint := storage.LoadCheckPoint(envConfig.CheckPointPath)
 	fetcher, err := videofetcher.New(context.Background(), envConfig.YoutubeSearch)
 	if err != nil {
 		log.Fatal("error while making videoFetcher", err)

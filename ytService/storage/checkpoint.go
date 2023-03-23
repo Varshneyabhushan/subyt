@@ -3,6 +3,7 @@ package storage
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"os"
 	"time"
 	"ytservice/videosservice"
@@ -22,7 +23,7 @@ type CheckPoint struct {
 
 var defaultLimitVideo, _ = time.Parse(time.RFC3339, "2023-03-10T00:00:00Z")
 
-func LoadCheckPoint(filePath string) (*CheckPoint, error) {
+func LoadCheckPoint(filePath string) *CheckPoint {
 	newCheckPoint := &CheckPoint{
 		filePath: filePath,
 		VideoLimit: videosservice.VideoComparor{
@@ -31,12 +32,16 @@ func LoadCheckPoint(filePath string) (*CheckPoint, error) {
 	}
 
 	bytes, err := os.ReadFile(filePath)
-	if err != nil {
-		return newCheckPoint, err
+	if errors.Is(err, os.ErrNotExist) {
+		_, err := os.Create(filePath)
+		log.Println("error while creating file for checkPoint : ", err)
+		return newCheckPoint
 	}
 
-	err = json.Unmarshal(bytes, newCheckPoint)
-	return newCheckPoint, err
+	//even when unmarshalling is succeeded or not, we will return the newCheckpoint
+	//so that, faulty file gets overwritten with this newCheckpoint when saved
+	_ = json.Unmarshal(bytes, newCheckPoint)
+	return newCheckPoint
 }
 
 func (p *CheckPoint) Save() error {
