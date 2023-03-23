@@ -53,7 +53,7 @@ export default function Header({ initSearch, goHome } : HeaderProps) {
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { xs: 'none', sm: 'block' } }}
+            sx={{ display: { xs: 'none', sm: 'block', fontFamily : "monaco", color : "red", fontWeight : 900 } }}
           >
             SubYT
           </Typography>
@@ -61,9 +61,9 @@ export default function Header({ initSearch, goHome } : HeaderProps) {
             variant="subtitle2"
             noWrap
             component="div"
-            sx={{ margin : "10px",  display: { xs: 'none', sm: 'block' } }}
+            sx={{ margin : "10px",  display: { xs: 'none', sm: 'block' }, color : theme.palette.primary.main }}
           >
-            SubYT
+            RRR oscars
           </Typography>
           <Button variant='text' sx={{ marginLeft : 1 }} onClick={() => goHome()}>
             <HomeIcon/>
