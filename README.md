@@ -73,3 +73,47 @@ or build the code using `npm run build`, but it should be hosted by a server
 
 `serve -s build`
 
+# Explaining the project
+
+The system is of 5 parts
+
+### 1. ytWorker 
+
+service that fetches youtube videos in the background and adds it to databases. 
+It can be stopped and started regardless of other parts of the system
+
+### 2. MongoDB 
+
+primary database that store the videos those are fetched from youtube
+
+### 3. SearchDB
+
+elastic search. It holds search indexes to support text search based on title/ description
+(based on description is yet to be implemented)
+
+### 4. VideosService
+
+Core of the project. This is what syncs the about 3 parts. Here is the place where APIS are hosted. 
+
+### 5. Web
+
+Frontend webpage to videos the data. Entire videos collection can be seen from here. Search can also be done
+
+# Thoughts
+
+**Why MongoDB for database?**
+
+All the columns are tightly coupled. When requested, entire data has to be sent. So, a document based database
+suits well for this project. Also, complex queries are not required.
+
+**Why add elastic search**
+
+Mongo search feature can only solves the requirement upto some extent. So, there is a need to add another 
+database to support searching documents better, based on their text fields
+
+**Why not, only elastic search**
+
+Writes to elastic search is consuming. Also, we might loose some documents as we are building the database. 
+So, there is a need for primary database. 
+
+
