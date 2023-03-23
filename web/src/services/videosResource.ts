@@ -4,7 +4,7 @@ import { Video } from "./videos"
 export default function videosResource(videosProvider: Promise<Video[]>) {
   let status = 'pending'
   let response: Video[] = [];
-  let err: Error;
+  let responseError: Error;
 
   const suspender = videosProvider.then(
     (res) => {
@@ -13,7 +13,7 @@ export default function videosResource(videosProvider: Promise<Video[]>) {
     },
     (err) => {
       status = 'error'
-      err = err
+      responseError = err
     },
   )
 
@@ -23,7 +23,7 @@ export default function videosResource(videosProvider: Promise<Video[]>) {
         case 'pending':
           throw suspender
         case 'error':
-          throw err
+          throw responseError
         default:
           return response
       }
