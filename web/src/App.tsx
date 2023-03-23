@@ -1,13 +1,12 @@
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Container, CssBaseline, Pagination, Stack, useStepContext } from '@mui/material';
+import { Container, CssBaseline } from '@mui/material';
 import Header from './Header';
 import VideosList from './VideosList';
 import { Suspense, useEffect, useState } from 'react';
 import VideosService, { VideosServiceConfig, VideoResource, CountResource } from './services/videos';
 import ErrorBoundary from './Components/ErrorBoundary';
-import videosResource from './services/videosResource';
-import { FmdBadTwoTone } from '@mui/icons-material';
+import PaginationCounter from './PaginationCounter';
 
 const darkTheme = createTheme({
   palette: {
@@ -16,9 +15,11 @@ const darkTheme = createTheme({
 });
 
 const config: VideosServiceConfig = { apiUrl: "http://localhost:3001" }
+const videosPerPage = 20
+
 const videosService = new VideosService(config)
 
-const videosPerPage = 20
+
 const initialVideos = videosService.getVideos(0, videosPerPage)
 const videosCount = videosService.getVideosCount()
 
@@ -64,15 +65,7 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Header initSearch={initSearch} goHome={goHome} />
-      <ErrorBoundary fallback={"error loading count"}>
-        <Suspense fallback={"loading..."}>
-          <Pagination
-            count={Math.ceil(countResource.read() / 20)}
-            page={page}
-            onChange={(_, pageNumber) => setPage(pageNumber)}
-            shape="rounded" />
-        </Suspense>
-      </ErrorBoundary>
+      <PaginationCounter page={page} setPage={setPage} countResource={countResource}/>
       <Container disableGutters sx={{
         overflow: "auto",
         maxHeight: "91vh",
