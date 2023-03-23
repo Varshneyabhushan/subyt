@@ -17,6 +17,8 @@ const darkTheme = createTheme({
 const config: VideosServiceConfig = { apiUrl: process.env.VIDEOS_SERVICE_API_URL ?? "" }
 const videosPerPage = 20
 
+console.log('apiUrl is : ', config.apiUrl)
+
 const videosService = new VideosService(config)
 
 
