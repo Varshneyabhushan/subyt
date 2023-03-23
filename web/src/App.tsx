@@ -72,7 +72,7 @@ function App() {
       </ErrorBoundary>
       <Container disableGutters sx={{
         overflow: "auto",
-        maxHeight: "91vh",
+        maxHeight: "84vh",
       }}>
         <ErrorBoundary fallback={"error while loading videos"}>
           <Suspense fallback={<h1> Loading </h1>}>
