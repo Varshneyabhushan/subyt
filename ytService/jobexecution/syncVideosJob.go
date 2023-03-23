@@ -43,6 +43,8 @@ func MakeSyncVideosJob(
 			return delayTracker.Delay(), nil
 		}
 		*checkPoint = newCheckPoint
+		log.Println("just synced total videos of ", totalValidVideos)
+		log.Println("new checkpoint : ", newCheckPoint)
 
 		//when pagination continues, sync shouldn't cool down
 		if len(checkPoint.NextPageToken) != 0 {
