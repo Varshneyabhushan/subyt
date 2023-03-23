@@ -1,7 +1,5 @@
 import { Pagination, Typography, useTheme } from "@mui/material";
 import { Container } from "@mui/system";
-import { Suspense } from "react";
-import ErrorBoundary from "../Components/ErrorBoundary";
 import { CountResource } from "../services/videos";
 
 interface PaginationCounterProps {
