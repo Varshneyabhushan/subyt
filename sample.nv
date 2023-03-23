@@ -11,7 +11,7 @@ MONGO_INITDB_DATABASE=videosService
 MONGO_DATA_PATH=~/Documents/subyt/database
 
 # port at which videos service need to be deployed
-VIDEO_SERVICE_PORT=3001
+VIDEOS_SERVICE_PORT=3001
 
 # youtube developer key
 YOUTUBE_SEARCH_DEV_KEY=apikeyhere
