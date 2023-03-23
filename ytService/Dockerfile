@@ -9,18 +9,18 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -o /ytService
+RUN go build -o /ytWorker
 
 FROM gcr.io/distroless/base-debian10 As Execution
 
 WORKDIR /
 
-COPY --from=build /ytService /ytService
+COPY --from=build /ytWorker /ytWorker
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["/ytService"]
+ENTRYPOINT ["/ytWorker"]
 
 COPY env.json ./
 
-CMD [ "/ytService" ]
+CMD [ "/ytWorker" ]

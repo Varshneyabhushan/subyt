@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"log"
-	"ytservice/env"
-	"ytservice/jobexecution"
-	"ytservice/storage"
-	"ytservice/videofetcher"
-	"ytservice/videosservice"
+	"ytworker/env"
+	"ytworker/jobexecution"
+	"ytworker/storage"
+	"ytworker/videofetcher"
+	"ytworker/videosservice"
 )
 
 func main() {

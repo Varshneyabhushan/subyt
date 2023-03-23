@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 	"syscall"
-	"ytservice/videosservice"
+	"ytworker/videosservice"
 )
 
 func saveVideos(service videosservice.VideosService, _ *DelayTracker,

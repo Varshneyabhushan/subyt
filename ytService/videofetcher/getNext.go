@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"google.golang.org/api/googleapi"
-	"ytservice/env"
-	"ytservice/videosservice"
+	"ytworker/env"
+	"ytworker/videosservice"
 
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"

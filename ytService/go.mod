@@ -1,4 +1,4 @@
-module ytservice
+module ytworker
 
 go 1.19
 

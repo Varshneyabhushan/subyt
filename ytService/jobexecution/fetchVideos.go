@@ -2,7 +2,7 @@ package jobexecution
 
 import (
 	"log"
-	"ytservice/videofetcher"
+	"ytworker/videofetcher"
 )
 
 func fetchVideoResponse(fetcher videofetcher.VideoFetcher, tracker *DelayTracker,

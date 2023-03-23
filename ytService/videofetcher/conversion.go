@@ -3,7 +3,7 @@ package videofetcher
 import (
 	"google.golang.org/api/youtube/v3"
 	"time"
-	"ytservice/videosservice"
+	"ytworker/videosservice"
 )
 
 func parseVideos(items []*youtube.SearchResult) []videosservice.Video {

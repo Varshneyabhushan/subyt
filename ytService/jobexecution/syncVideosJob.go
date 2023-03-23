@@ -3,10 +3,10 @@ package jobexecution
 import (
 	"log"
 	"time"
-	"ytservice/env"
-	"ytservice/storage"
-	"ytservice/videofetcher"
-	"ytservice/videosservice"
+	"ytworker/env"
+	"ytworker/storage"
+	"ytworker/videofetcher"
+	"ytworker/videosservice"
 )
 
 func MakeSyncVideosJob(
