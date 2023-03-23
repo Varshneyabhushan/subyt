@@ -61,6 +61,7 @@ services:
       - SCHEDULER_SYNC_COOL_DOWN=$SCHEDULER_SYNC_COOL_DOWN
       - SCHEDULER_REQUEST_COOL_DOWN=$SCHEDULER_SYNC_COOL_DOWN
       - VIDEOS_SERVICE_URL=http://subyt.videosservice
+      - YOUTUBE_MAX_RESULTS=$YOUTUBE_MAX_RESULTS
 
     networks:
       - mongoNetwork
