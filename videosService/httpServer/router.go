@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"videosservice/addVideos"
 	"videosservice/getVideos"
+	"videosservice/getVideosCount"
 	"videosservice/searchVideos"
 
 	"videosservice/storageServices/elasticsearch"
@@ -32,6 +33,9 @@ func MakeRouter(mongoService mongo.Service,
 
 	gettingService := getVideos.MakeGetVideosService(mongoVideosService)
 	router.GET("/", cors(getVideos.MakeEndpoint(gettingService)))
+
+	videosCountService := getVideosCount.MakeService(mongoVideosService)
+	router.GET("/count", cors(getVideosCount.MakeEndpoint(videosCountService)))
 
 	searchingService := searchVideos.MakeSearchService(mongoVideosService, esVideosService)
 	router.GET("/search", cors(searchVideos.MakeEndpoint(searchingService)))

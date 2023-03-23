@@ -12,7 +12,6 @@ type Collection[T interface{}] struct {
 	collection *mongo.Collection
 }
 
-// collection: client.Database(config.DatabaseName).Collection(collectionName),
 func (col *Collection[T]) Get(skip, limit int64, sort bson.M) ([]T, error) {
 	findOptions := options.Find().
 		SetSkip(skip).
@@ -25,6 +24,11 @@ func (col *Collection[T]) Get(skip, limit int64, sort bson.M) ([]T, error) {
 	}
 
 	return getDocumentsFromCursor[T](cursor), nil
+}
+
+func (col *Collection[T]) GetCount() (int64, error) {
+	count, err := col.collection.CountDocuments(context.TODO(), bson.M{})
+	return count, err
 }
 
 func (col *Collection[T]) Add(newDocs []T) (int, error) {
