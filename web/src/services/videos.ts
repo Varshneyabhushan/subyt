@@ -49,6 +49,8 @@ export default class VideosService {
     }
 
     searchVideos(term : string, skip : number, limit : number) : VideoResource {
-        return videosResource(Promise.reject("not yet implemented"))
+        let provider = this.axios.get(`search?term=${term}&skip=${skip}&limit=${limit}`)
+            .then(res => res.data.Videos || [])
+        return videosResource(provider)
     }
 }
