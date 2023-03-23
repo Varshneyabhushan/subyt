@@ -61,6 +61,7 @@ function App() {
   function goHome() {
     setCurrentContext(false)
     setPage(1)
+    setCountResource(videosService.getVideosCount())
   }
 
   return (
