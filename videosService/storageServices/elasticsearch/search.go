@@ -15,7 +15,7 @@ type EsHit[T interface{}] struct {
 }
 
 type HitsResult[T interface{}] struct {
-	Total struct{ Value int }
+	Total struct{ Value int64 }
 	Hits  []EsHit[T]
 }
 
@@ -25,16 +25,16 @@ type queryResponse[T interface{}] struct {
 	HitsResult HitsResult[T] `json:"hits"`
 }
 
-func GetDocsFromResponse[T interface{}](response *esapi.Response) ([]T, error) {
+func GetDocsFromResponse[T interface{}](response *esapi.Response) ([]T, int64, error) {
 	responseBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, errors.New("error while reading response : " + err.Error())
+		return nil, 0, errors.New("error while reading response : " + err.Error())
 	}
 
 	var esResult queryResponse[T]
 	err = json.Unmarshal(responseBytes, &esResult)
 	if err != nil {
-		return nil, errors.New("error while reading result : " + err.Error())
+		return nil, 0, errors.New("error while reading result : " + err.Error())
 	}
 
 	var result []T
@@ -42,7 +42,7 @@ func GetDocsFromResponse[T interface{}](response *esapi.Response) ([]T, error) {
 		result = append(result, hit.Source)
 	}
 
-	return result, nil
+	return result, esResult.HitsResult.Total.Value, nil
 }
 
 func buildQuery(term string, skip int, limit int) any {
@@ -57,17 +57,17 @@ func buildQuery(term string, skip int, limit int) any {
 	}
 }
 
-func (service *Index[T]) Search(term string, skip, limit int) ([]T, error) {
+func (service *Index[T]) Search(term string, skip, limit int) ([]T, int64, error) {
 	var buf bytes.Buffer
 	query := buildQuery(term, skip, limit)
 	if err := json.NewEncoder(&buf).Encode(query); err != nil {
-		return nil, errors.New("Error encoding query: " + err.Error())
+		return nil, 0, errors.New("Error encoding query: " + err.Error())
 	}
 
 	search := service.esClient.Search
 	response, err := search(search.WithIndex(service.indexName), search.WithBody(&buf))
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	return GetDocsFromResponse[T](response)

@@ -11,9 +11,10 @@ import (
 
 type response struct {
 	Videos []addVideos.VideoResponse
+	Count  int64
 }
 
-type Service func(term string, skip, limit int) ([]addVideos.VideoResponse, error)
+type Service func(term string, skip, limit int) ([]addVideos.VideoResponse, int64, error)
 
 func MakeEndpoint(search Service) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -30,14 +31,14 @@ func MakeEndpoint(search Service) httprouter.Handle {
 			limit = 10
 		}
 
-		searchedVideos, err := search(term, skip, limit)
+		searchedVideos, count, err := search(term, skip, limit)
 		if err != nil {
 			http.Error(w, "error while getting searchedVideos : "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		w.Header().Set("content-type", "application/json")
-		err = json.NewEncoder(w).Encode(response{Videos: searchedVideos})
+		err = json.NewEncoder(w).Encode(response{Videos: searchedVideos, Count: count})
 		if err != nil {
 			log.Fatal("error while sending response in searchVideos api : ", err)
 		}
