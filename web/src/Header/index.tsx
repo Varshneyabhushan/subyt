@@ -63,7 +63,7 @@ export default function Header({ initSearch, goHome } : HeaderProps) {
             component="div"
             sx={{ margin : "10px",  display: { xs: 'none', sm: 'block' }, color : theme.palette.primary.main }}
           >
-            RRR oscars
+            {process.env.TOPIC}
           </Typography>
           <Button variant='text' sx={{ marginLeft : 1 }} onClick={() => goHome()}>
             <HomeIcon/>

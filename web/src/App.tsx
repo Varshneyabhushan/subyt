@@ -14,7 +14,7 @@ const darkTheme = createTheme({
   },
 });
 
-const config: VideosServiceConfig = { apiUrl: "http://localhost:3001" }
+const config: VideosServiceConfig = { apiUrl: process.env.VIDEOS_SERVICE_API_URL ?? "" }
 const videosPerPage = 20
 
 const videosService = new VideosService(config)
