@@ -1,0 +1,38 @@
+
+#port at which mongodb has to be deployed
+MONGO_PORT=27017
+
+# credentials for mongo database that is being created
+MONGO_INITDB_ROOT_USERNAME=randomUser
+MONGO_INITDB_ROOT_PASSWORD=randomPassword
+MONGO_INITDB_DATABASE=videosService
+
+# path in which mongo stores it's data
+MONGO_DATA_PATH=~/Documents/subyt/database
+
+# port at which videos service need to be deployed
+VIDEO_SERVICE_PORT=3001
+
+# youtube developer key
+YOUTUBE_SEARCH_DEV_KEY=apikeyhere
+
+# topic on which youtube videos have to be fetched
+TOPIC=RRR Oscar
+
+# cool down time when the sync is complete
+SCHEDULER_SYNC_COOL_DOWN=60
+
+# cool down between requests to youtube api
+SCHEDULER_REQUEST_COOL_DOWN=10
+
+# path in which checkpoint is stored (point till where youtube videos are fetched)
+YTSERVICE_CHECKPOINT=/Users/varshneyabhushan/repos/subyt/ytService/checkPoint.json
+
+#searchDB
+SEARCH_DB_PORT=9200
+
+# path in which elastic search stores its data
+SEARCH_DB_PATH=~/Documents/subyt/searchService
+
+#web 
+PORT=3000

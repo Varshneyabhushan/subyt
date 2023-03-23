@@ -6,15 +6,15 @@ services:
     container_name: videosDb
 
     ports:
-      - 27017:27017
+      - $MONGO_PORT:27017
 
     volumes:
-      - ~/Documents/subyt/database:/data/db
+      - $MONGO_DATA_PATH:/data/db
 
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=randomUser
-      - MONGO_INITDB_ROOT_PASSWORD=randomPassword
-      - MONGO_INITDB_DATABASE=videosService
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+      - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
 
     networks:
       - mongoNetwork
@@ -30,15 +30,16 @@ services:
     container_name: videosService
 
     ports:
-      - 3001:3001
+      - $VIDEO_SERVICE_PORT:80
 
     build:
       context: videosService
 
     environment:
-      - PORT=3001
-      - MONGO_URI=mongodb://randomUser:randomPassword@subyt.videosdb:27017
-      - MONGO_DATABASE=videosService
+      - PORT=80
+      - MONGO_URI=mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@subyt.videosdb:27017
+      - MONGO_DATABASE=$MONGO_INITDB_DATABASE
+      - ELASTICSEARCH_URI=http://subyt.searchdb:9200
 
     depends_on:
       subyt.videosdb:
@@ -55,11 +56,11 @@ services:
       context: ytService
 
     environment:
-      - YOUTUBE_SEARCH_DEV_KEY=AIzaSyAIKdxKjTCEc6U45OZ5MTeVhhye2XtCJ9c
-      - YOUTUBE_SEARCH_QUERY=RRR Oscar
-      - SCHEDULER_SYNC_COOL_DOWN=30
-      - SCHEDULER_REQUEST_COOL_DOWN=10
-      - VIDEOS_SERVICE_URL=http://subyt.videosservice:3001
+      - YOUTUBE_SEARCH_DEV_KEY=$YOUTUBE_SEARCH_DEV_KEY
+      - YOUTUBE_SEARCH_QUERY=$TOPIC
+      - SCHEDULER_SYNC_COOL_DOWN=$SCHEDULER_SYNC_COOL_DOWN
+      - SCHEDULER_REQUEST_COOL_DOWN=$SCHEDULER_SYNC_COOL_DOWN
+      - VIDEOS_SERVICE_URL=http://subyt.videosservice
 
     networks:
       - mongoNetwork
@@ -69,17 +70,17 @@ services:
         condition: service_healthy
 
     volumes:
-      - /Users/varshneyabhushan/repos/subyt/ytService/checkPoint.json:/checkPoint.json
+      - $YTSERVICE_CHECKPOINT:/checkPoint.json
 
   subyt.searchdb:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
     container_name: searchDb
 
     ports:
-      - 9200:9200
+      - $SEARCH_DB_PORT:9200
 
     volumes:
-      - ~/Documents/subyt/searchService:/usr/share/elasticsearch/data
+      - $SEARCH_DB_PATH:/usr/share/elasticsearch/data
 
     environment:
       - xpack.security.enabled=false
@@ -88,6 +89,22 @@ services:
     networks:
       - mongoNetwork
     
+  subyt.web:
+    image: subyt.web
+    container_name: web
+
+    ports:
+      - $PORT:80
+
+    build:
+      context: web
+
+    environment:
+      - REACT_APP_VIDEOS_SERVICE_API_URL=http://subyt.videosservice
+      - REACT_APP_TOPIC=$TOPIC
+
+    networks:
+      - mongoNetwork
 
 
 networks:
