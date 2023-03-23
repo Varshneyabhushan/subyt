@@ -48,12 +48,12 @@ services:
     networks:
       - mongoNetwork
 
-  subyt.ytservice:
-    image: ytservice
-    container_name: ytService
+  subyt.ytworker:
+    image: ytworker
+    container_name: ytWorker
 
     build:
-      context: ytService
+      context: ytWorker
 
     environment:
       - YOUTUBE_SEARCH_DEV_KEY=$YOUTUBE_SEARCH_DEV_KEY
@@ -71,7 +71,7 @@ services:
         condition: service_healthy
 
     volumes:
-      - $YTSERVICE_CHECKPOINT:/checkPoint.json
+      - $YTWORKER_CHECKPOINT:/checkPoint.json
 
   subyt.searchdb:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
