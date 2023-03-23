@@ -43,10 +43,7 @@ export default class VideosService {
 
     getVideos(skip : number, limit : number) : VideoResource {
         let provider = this.axios.get(`?skip=${skip}&limit=${limit}`)
-            .then(res => {
-                console.log(res.data)
-                return res.data.Videos
-            })
+            .then(res => res.data.Videos || [])
 
         return videosResource(provider)
     }
