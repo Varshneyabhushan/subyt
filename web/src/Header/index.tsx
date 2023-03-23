@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import SearchIcon from '@mui/icons-material/Search';
+import HomeIcon from '@mui/icons-material/Home';
 import Button from "@mui/material/Button";
 import { useState } from 'react';
 import { TextField, useTheme } from '@mui/material';
@@ -28,7 +29,6 @@ const StyledInputBase = styled(TextField)(({ theme }) => ({
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 0, 1, 1),
     // vertical padding + font size from searchIcon
-    paddingRight: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
@@ -39,9 +39,10 @@ const StyledInputBase = styled(TextField)(({ theme }) => ({
 
 interface HeaderProps {
   initSearch : (searchTerm : string) => void;
+  goHome : () => void;
 }
 
-export default function Header({ initSearch } : HeaderProps) {
+export default function Header({ initSearch, goHome } : HeaderProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const theme = useTheme()
   return (
@@ -64,6 +65,9 @@ export default function Header({ initSearch } : HeaderProps) {
           >
             SubYT
           </Typography>
+          <Button variant='text' sx={{ marginLeft : 1 }} onClick={() => goHome()}>
+            <HomeIcon/>
+          </Button>
           <Search>
             <StyledInputBase
             variant='standard'
