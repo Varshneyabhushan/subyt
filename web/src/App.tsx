@@ -49,11 +49,15 @@ function App() {
     setCurrentContext(true)
   }
 
+  function goHome() {
+    setCurrentContext(false)
+    setPage(1)
+  }
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Header initSearch={initSearch}/>
+      <Header initSearch={initSearch} goHome={goHome}/>
       <Pagination 
         count={Math.ceil(videosCount/20)} 
         page={page} 
