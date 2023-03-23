@@ -88,22 +88,6 @@ services:
 
     networks:
       - mongoNetwork
-    
-  subyt.web:
-    image: subyt.web
-    container_name: web
-
-    ports:
-      - $PORT:80
-
-    build:
-      context: web
-      args:
-        - REACT_APP_VIDEOS_SERVICE_API_URL=http://localhost:$VIDEOS_SERVICE_PORT
-        - REACT_APP_TOPIC=$TOPIC
-
-    networks:
-      - mongoNetwork
 
 
 networks:
