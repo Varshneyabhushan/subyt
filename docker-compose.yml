@@ -23,7 +23,7 @@ services:
       test: echo 'db.runCommand("ping").ok' | mongosh subyt.videosdb:27017 --quiet
       retries: 5
       interval: 5s
-      start_period: 30s
+      start_period: 10s
 
   subyt.videosservice:
     image: videosservice
@@ -98,10 +98,9 @@ services:
 
     build:
       context: web
-
-    environment:
-      - REACT_APP_VIDEOS_SERVICE_API_URL=http://subyt.videosservice
-      - REACT_APP_TOPIC=$TOPIC
+      args:
+        - REACT_APP_VIDEOS_SERVICE_API_URL=http://localhost:$VIDEO_SERVICE_PORT
+        - REACT_APP_TOPIC=$TOPIC
 
     networks:
       - mongoNetwork
