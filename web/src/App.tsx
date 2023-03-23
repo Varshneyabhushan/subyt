@@ -37,7 +37,7 @@ function App() {
   useEffect(() => {
     let skip = (page - 1) * videosPerPage
     //home page
-    if(currentContext) {
+    if (currentContext) {
       let [countResource, videosResource] = videosService.searchVideos(searchTerm, skip, videosPerPage)
       setCountResource(countResource)
       setVideoResource(videosResource)
@@ -65,7 +65,11 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Header initSearch={initSearch} goHome={goHome} />
-      <PaginationCounter page={page} setPage={setPage} countResource={countResource}/>
+      <ErrorBoundary fallback={"error loading count"}>
+        <Suspense fallback={"loading..."}>
+          <PaginationCounter page={page} setPage={setPage} countResource={countResource} />
+        </Suspense>
+      </ErrorBoundary>
       <Container disableGutters sx={{
         overflow: "auto",
         maxHeight: "91vh",
