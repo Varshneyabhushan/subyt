@@ -21,7 +21,8 @@ type CheckPoint struct {
 	NextPageToken  string
 }
 
-var defaultLimitVideo, _ = time.Parse(time.RFC3339, "2023-03-10T00:00:00Z")
+// limited to 120 days by default
+var defaultLimitVideo = time.Now().Add(-time.Hour * 24 * 120)
 
 func LoadCheckPoint(filePath string) *CheckPoint {
 	newCheckPoint := &CheckPoint{
